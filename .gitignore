@@ -128,3 +128,16 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Terraform State Files
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+terraform.tfstate.d/
+
+# Lock-Dateien
+.terraform.tfstate.lock.info
+
+# Sensitive Variable Files
+*.tfvars
+
