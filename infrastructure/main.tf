@@ -1,7 +1,3 @@
-provider "aws" {
-  region = var.aws_region
-}
-
 # 1. ECR Repository erstellen
 resource "aws_ecr_repository" "live_chat_repo" {
   name = "live-chat-app"
@@ -203,4 +199,80 @@ resource "aws_iam_policy_attachment" "ecs_task_execution_policy" {
   name       = "ecs-task-execution-policy"
   roles      = [data.aws_iam_role.ecs_task_execution_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+locals {
+  s3_bucket_name = "sys-crowdconnect-scheider"  # Eindeutiger Name
+}
+
+resource "aws_s3_bucket" "main" {
+  bucket = local.s3_bucket_name
+}
+
+resource "aws_cloudfront_origin_access_control" "main" {
+  name                              = "s3-cloudfront-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
+resource "aws_cloudfront_distribution" "main" {
+  # Hier keine Aliases mehr, da wir keine eigene Domain nutzen
+  default_root_object = "index.html"
+  enabled             = true
+  is_ipv6_enabled     = true
+  wait_for_deployment = true
+
+  default_cache_behavior {
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    target_origin_id       = aws_s3_bucket.main.bucket
+    # HTTP erlauben
+    viewer_protocol_policy = "allow-all"
+  }
+
+  origin {
+    domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.main.id
+    origin_id                = aws_s3_bucket.main.bucket
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  # Kein viewer_certificate Block mehr, somit kein HTTPS-Zwang
+}
+
+data "aws_iam_policy_document" "cloudfront_oac_access" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetObject"
+    ]
+
+    resources = ["${aws_s3_bucket.main.arn}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.main.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "main" {
+  bucket = aws_s3_bucket.main.id
+  policy = data.aws_iam_policy_document.cloudfront_oac_access.json
 }
