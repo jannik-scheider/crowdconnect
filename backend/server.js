@@ -7,7 +7,7 @@ const path = require('path');
 // CORS-Optionen für Socket.IO
 const io = new Server(http, {
   cors: {
-    origin: "https://d2ggrwl4e96sli.cloudfront.net", // Frontend-Port
+    origin: "http://localhost:5173", // Frontend-Port
     methods: ["GET", "POST"],
     credentials: true
   }
