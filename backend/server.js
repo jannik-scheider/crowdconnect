@@ -17,7 +17,6 @@ const io = new Server(http, {
 
 io.on('connection', (socket) => {
   let username;
-  let hasDisconnected = false; // Initialized for each connection
 
   console.log(`new websocket connection: ${socket.id}`);
 
@@ -36,8 +35,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log(`websocket connection disconnected: ${socket.id}`);
-    if (username && !hasDisconnected) { // Ensure that it is only sent once
-      hasDisconnected = true;
+    if (username) {
       console.log(`${username} has left the chat.`);
       socket.broadcast.emit('userLeft', username);
     }
