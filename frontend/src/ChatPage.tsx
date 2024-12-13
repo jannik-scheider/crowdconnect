@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const socket = io('http://live-chat-alb-1421035784.eu-central-1.elb.amazonaws.com', {
+const socket = io('http://522814722868.dkr.ecr.eu-central-1.amazonaws.com/live-chat-app', {
   withCredentials: true,
   transports: ['websocket'], // Erzwingt WebSocket
 });
