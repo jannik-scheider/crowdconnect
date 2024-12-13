@@ -2,52 +2,49 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const { Server } = require('socket.io');
-const path = require('path');
+require('dotenv').config();
 
-// CORS-Optionen für Socket.IO
+
 const io = new Server(http, {
   cors: {
-    origin: "https://d2ggrwl4e96sli.cloudfront.net", // Frontend-Port
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-// Statische Dateien servieren
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 io.on('connection', (socket) => {
   let username;
-  let hasDisconnected = false; // Wird für jede Verbindung initialisiert
 
-  console.log(`Neuer WebSocket verbunden: ${socket.id}`);
+  console.log(`new websocket connection: ${socket.id}`);
 
   socket.on('joinChat', (name) => {
-    if (!username) { // Nur senden, wenn username noch nicht gesetzt ist
+    if (!username) {
       username = name;
-      console.log(`${username} hat den Chat betreten.`);
+      console.log(`${username} has joined the chat.`);
       socket.broadcast.emit('userJoined', username);
     }
   });
 
   socket.on('chatMessage', (msg) => {
-    console.log(`Nachricht von ${username}: ${msg}`);
+    console.log(`message from ${username}: ${msg}`);
     io.emit('chatMessage', { username: username, message: msg });
   });
 
   socket.on('disconnect', () => {
-    console.log(`WebSocket Verbindung getrennt: ${socket.id}`);
-    if (username && !hasDisconnected) { // Sicherstellen, dass nur einmal gesendet wird
-      hasDisconnected = true;
-      console.log(`${username} hat den Chat verlassen.`);
+    console.log(`websocket connection disconnected: ${socket.id}`);
+    if (username) {
+      console.log(`${username} has left the chat.`);
       socket.broadcast.emit('userLeft', username);
     }
   });
 });
 
 
-// Server starten
+// start server
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
-    console.log(`Server läuft auf Port ${PORT}`);
+    console.log(`server runs on port ${PORT}`);
 });
