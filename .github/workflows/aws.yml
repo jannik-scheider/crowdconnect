@@ -1,62 +1,35 @@
-name: Deploy Live Chat App to Amazon ECS
+name: Build and Push Docker Image to ECR
 
 on:
   push:
-    branches: [ "main" ] # Trigger auf Änderungen im `main`-Branch
-
-env:
-  AWS_REGION: eu-central-1                  # AWS Region
-  ECR_REPOSITORY: live-chat-app             # Name des ECR-Repositories
-  ECS_SERVICE: live-chat-service            # Name des ECS-Service
-  ECS_CLUSTER: live-chat-cluster            # Name des ECS-Clusters
-  ECS_TASK_DEFINITION: ecs-task-definition.json # Pfad zur Task-Definition
-  CONTAINER_NAME: live-chat-container       # Name des Containers in der Task-Definition
-
-permissions:
-  contents: read
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    name: Deploy
+  build-and-push:
     runs-on: ubuntu-latest
-
+    env:
+      AWS_REGION: eu-central-1
+      IMAGE_NAME: live-chat-app
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, Tag, and Push Docker Image
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-    - name: Update ECS Task Definition with New Image
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy to ECS
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: Build, Tag, and Push Image to ECR
+        run: |
+          # Baue das Docker Image 
+          docker build -t $IMAGE_NAME ./backend
+          # Taggen des Images für ECR
+          docker tag $IMAGE_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
+          # Push to ECR
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
