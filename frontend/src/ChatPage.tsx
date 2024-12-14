@@ -1,19 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const socket = io('http://localhost:3000', {
-  withCredentials: true,
-  transports: ['websocket'], // Erzwingt WebSocket
-});
 
 interface Message {
   user: string;
   message: string;
 }
+
+let socket: Socket | null = null;
 
 const ChatPage: React.FC = () => {
   const location = useLocation();
@@ -23,14 +20,18 @@ const ChatPage: React.FC = () => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Wenn kein Username vorhanden ist, zurück zur Startseite
-    // und vollständiger Reload:
     if (!username) {
       window.location.href = '/';
       return;
     }
 
-    // Nutzer tritt dem Chat bei
+    // Initialisierung des Sockets
+    socket = io('http://localhost:3000', {
+      withCredentials: true,
+      transports: ['websocket'],
+    });
+
+    // Benutzer tritt dem Chat bei
     socket.emit('joinChat', username);
 
     // Listener registrieren
@@ -46,13 +47,14 @@ const ChatPage: React.FC = () => {
       setMessages((prev) => [...prev, { user: 'System', message: `${name} hat den Chat verlassen.` }]);
     });
 
-    // Cleanup beim Unmount
+    // Cleanup beim Verlassen der Komponente
     return () => {
-      socket.off('chatMessage');
-      socket.off('userJoined');
-      socket.off('userLeft');
+      if (socket) {
+        socket.disconnect();
+        socket = null; // Verbindung zurücksetzen
+      }
     };
-  }, [username]);
+  }, []);
 
   useEffect(() => {
     // Automatisches Scrollen nach unten
@@ -60,19 +62,20 @@ const ChatPage: React.FC = () => {
   }, [messages]);
 
   const sendMessage = () => {
-    if (message.trim()) {
+    if (message.trim() && socket) {
       socket.emit('chatMessage', message);
-      setMessage(''); 
+      setMessage('');
     }
   };
 
   const leaveChat = () => {
-    // Socket trennen
-    socket.disconnect();
-    // Vollständiger Seitenreload zur Landepage
+    if (socket) {
+      socket.disconnect();
+      socket = null; // Verbindung zurücksetzen
+    }
     window.location.href = '/';
   };
-
+  
   // Farben
   const ownUserColor = '#ff9ff3';
   const otherUserColor = '#48dbfb';
