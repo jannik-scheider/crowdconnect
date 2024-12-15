@@ -26,7 +26,7 @@ const ChatPage: React.FC = () => {
     }
 
     // Initialisierung des Sockets
-    socket = io('http://localhost:3000', {
+    socket = io('https://api.crowdconnect.fun', {
       withCredentials: true,
       transports: ['websocket'],
     });

@@ -13,24 +13,44 @@ resource "aws_vpc" "live_chat_vpc" {
   }
 }
 
-# 3. Subnet in zwei Availability Zones
-resource "aws_subnet" "live_chat_subnet_a" {
-  vpc_id            = aws_vpc.live_chat_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "eu-central-1a"
+resource "aws_subnet" "public_subnet_a" {
+  vpc_id                  = aws_vpc.live_chat_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "eu-central-1a"
   tags = {
-    Name = "live-chat-subnet-a"
+    Name = "public-subnet-a"
   }
 }
 
-resource "aws_subnet" "live_chat_subnet_b" {
-  vpc_id            = aws_vpc.live_chat_vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "eu-central-1b"
+resource "aws_subnet" "public_subnet_b" {
+  vpc_id                  = aws_vpc.live_chat_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "eu-central-1b"
   tags = {
-    Name = "live-chat-subnet-b"
+    Name = "public-subnet-b"
   }
 }
+
+resource "aws_subnet" "private_subnet_a" {
+  vpc_id            = aws_vpc.live_chat_vpc.id
+  cidr_block        = "10.0.11.0/24"
+  availability_zone = "eu-central-1a"
+  tags = {
+    Name = "private-subnet-a"
+  }
+}
+
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = aws_vpc.live_chat_vpc.id
+  cidr_block        = "10.0.12.0/24"
+  availability_zone = "eu-central-1b"
+  tags = {
+    Name = "private-subnet-b"
+  }
+}
+
 
 # Internet Gateway erstellen
 resource "aws_internet_gateway" "live_chat_igw" {
@@ -41,44 +61,85 @@ resource "aws_internet_gateway" "live_chat_igw" {
   }
 }
 
-# Route Table erstellen
-resource "aws_route_table" "live_chat_rt" {
+# Route Tables für public und private Subnetze erstellen:
+# Public Route Table mit Internet Gateway
+resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.live_chat_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.live_chat_igw.id
-  }
-
   tags = {
-    Name = "live-chat-rt"
+    Name = "public-rt"
   }
 }
 
-# Route Table mit Subnet A verbinden
-resource "aws_route_table_association" "live_chat_rta_a" {
-  subnet_id      = aws_subnet.live_chat_subnet_a.id
-  route_table_id = aws_route_table.live_chat_rt.id
+resource "aws_route" "public_internet_access" {
+  route_table_id         = aws_route_table.public_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.live_chat_igw.id
 }
 
-# Route Table mit Subnet B verbinden
-resource "aws_route_table_association" "live_chat_rta_b" {
-  subnet_id      = aws_subnet.live_chat_subnet_b.id
-  route_table_id = aws_route_table.live_chat_rt.id
+resource "aws_route_table_association" "public_rta_a" {
+  subnet_id      = aws_subnet.public_subnet_a.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
+resource "aws_route_table_association" "public_rta_b" {
+  subnet_id      = aws_subnet.public_subnet_b.id
+  route_table_id = aws_route_table.public_rt.id
+}
 
-resource "aws_security_group" "live_chat_sg" {
+# NAT Gateway im Public Subnetz erstellen
+resource "aws_eip" "nat_eip" {
+  vpc = true
+  tags = {
+    Name = "nat-eip"
+  }
+}
+
+resource "aws_nat_gateway" "nat_gw" {
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public_subnet_a.id
+  tags = {
+    Name = "nat-gw"
+  }
+  depends_on = [aws_internet_gateway.live_chat_igw]
+}
+
+# Private Route Table mit NAT Gateway
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.live_chat_vpc.id
+  tags = {
+    Name = "private-rt"
+  }
+}
+
+resource "aws_route" "private_internet_access" {
+  route_table_id         = aws_route_table.private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.nat_gw.id
+}
+
+resource "aws_route_table_association" "private_rta_a" {
+  subnet_id      = aws_subnet.private_subnet_a.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_rta_b" {
+  subnet_id      = aws_subnet.private_subnet_b.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+# ALB Security Group (alb_sg): Erlaubt eingehenden Traffic von 0.0.0.0/0 auf Port 80/443.
+resource "aws_security_group" "alb_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
-  # Inbound (Eingehender Traffic)
+  # HTTPS Ingress
   ingress {
-    from_port   = 3000
-    to_port     = 3000
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Falls gewünscht: HTTP Ingress für Weiterleitung
   ingress {
     from_port   = 80
     to_port     = 80
@@ -86,18 +147,42 @@ resource "aws_security_group" "live_chat_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Outbound (Ausgehender Traffic)
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1" # Erlaubt alle Protokolle
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
-    Name = "live-chat-sg"
+    Name = "alb-sg"
   }
 }
+
+
+# ECS Service Security Group (live_chat_service_sg): Erlaubt eingehenden Traffic nur von der ALB-SG auf Port 3000. Kein direkter Zugriff aus dem Internet.
+resource "aws_security_group" "live_chat_service_sg" {
+  vpc_id = aws_vpc.live_chat_vpc.id
+  
+  ingress {
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]  # ALB SG als Quelle
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "live-chat-service-sg"
+  }
+}
+
 
 
 # 5. ECS Cluster
@@ -137,12 +222,13 @@ resource "aws_lb" "live_chat_alb" {
   name               = "live-chat-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.live_chat_sg.id]
-  subnets            = [
-    aws_subnet.live_chat_subnet_a.id,
-    aws_subnet.live_chat_subnet_b.id
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets = [
+    aws_subnet.public_subnet_a.id,
+    aws_subnet.public_subnet_b.id
   ]
 }
+
 
 resource "aws_lb_target_group" "live_chat_target" {
   name        = "live-chat-tg"
@@ -152,16 +238,38 @@ resource "aws_lb_target_group" "live_chat_target" {
   target_type = "ip"
 }
 
-resource "aws_lb_listener" "live_chat_listener" {
+
+resource "aws_lb_listener" "live_chat_http_listener" {
   load_balancer_arn = aws_lb.live_chat_alb.arn
   port              = 80
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+
+resource "aws_lb_listener" "live_chat_https_listener" {
+  load_balancer_arn = aws_lb.live_chat_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = local.eu_cert_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.live_chat_target.arn
   }
 }
+
+
 
 # 8. ECS Service
 resource "aws_ecs_service" "live_chat_service" {
@@ -173,11 +281,11 @@ resource "aws_ecs_service" "live_chat_service" {
 
   network_configuration {
     subnets         = [
-      aws_subnet.live_chat_subnet_a.id,
-      aws_subnet.live_chat_subnet_b.id
+      aws_subnet.private_subnet_a.id,
+      aws_subnet.private_subnet_b.id
     ]
-    security_groups = [aws_security_group.live_chat_sg.id]
-    assign_public_ip = true
+    security_groups = [aws_security_group.live_chat_service_sg.id]
+    assign_public_ip = false
   }
 
   load_balancer {
@@ -186,8 +294,11 @@ resource "aws_ecs_service" "live_chat_service" {
     container_port   = 3000
   }
 
-  depends_on = [aws_lb_listener.live_chat_listener]
+  depends_on = [aws_lb_listener.live_chat_https_listener, 
+  aws_lb_listener.live_chat_http_listener
+  ]
 }
+
 
 # 9. IAM Role für Task-Execution
 # Verwende die bestehende Rolle ecsTaskExecutionRole
@@ -201,23 +312,22 @@ resource "aws_iam_policy_attachment" "ecs_task_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+
 locals {
-  s3_bucket_name = "sys-crowdconnect-scheider"  # Eindeutiger Name
+  s3_bucket_name = "sys-crowdconnect-scheider"
+  domain         = "crowdconnect.fun"
+  hosted_zone_id = "Z080884724KY8PB2MXITF"
+  us_cert_arn       = "arn:aws:acm:us-east-1:522814722868:certificate/697927e5-9734-4a1a-b5be-23b65a487b95"
+  eu_cert_arn = "arn:aws:acm:eu-central-1:522814722868:certificate/bea0afbf-6f4b-4d7b-abc8-e5210bfeee65"
 }
 
 resource "aws_s3_bucket" "main" {
   bucket = local.s3_bucket_name
 }
 
-resource "aws_cloudfront_origin_access_control" "main" {
-  name                              = "s3-cloudfront-oac"
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
 
 resource "aws_cloudfront_distribution" "main" {
-  # Hier keine Aliases mehr, da wir keine eigene Domain nutzen
+  aliases             = [local.domain]
   default_root_object = "index.html"
   enabled             = true
   is_ipv6_enabled     = true
@@ -228,8 +338,7 @@ resource "aws_cloudfront_distribution" "main" {
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     target_origin_id       = aws_s3_bucket.main.bucket
-    # HTTP erlauben
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
   }
 
   origin {
@@ -245,10 +354,17 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = local.us_cert_arn
+    minimum_protocol_version = "TLSv1.2_2021"
+    ssl_support_method       = "sni-only"
   }
+}
 
-  # Kein viewer_certificate Block mehr, somit kein HTTPS-Zwang
+resource "aws_cloudfront_origin_access_control" "main" {
+  name                              = "s3-cloudfront-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 data "aws_iam_policy_document" "cloudfront_oac_access" {
