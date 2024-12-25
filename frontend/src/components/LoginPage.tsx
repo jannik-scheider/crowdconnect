@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 
-const LandingPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+const LoginPage: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
 
-  const handleJoin = () => {
-    if (username.trim()) {
-      navigate('/chat', { state: { username } });
-    }
+  // useEffect(() => {
+  //   const isValid = username.trim() !== "" && roomName.trim() !== "";
+  //   setIsFormValid(isValid);
+  // }, [username, roomName]);
+
+  const handleJoin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    navigate("/chat-rooms", { state: { username } });
   };
 
   return (
-    <div 
-      className="flex h-screen items-center justify-center 
-                 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 
-                 p-4"
+    <form
+      className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4"
+      onSubmit={handleJoin}
     >
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -34,7 +39,7 @@ const LandingPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          Willkommen im Chat!
+          Willkommen zu CrowdConnect!
         </motion.h1>
         <motion.div
           className="w-full"
@@ -43,19 +48,27 @@ const LandingPage: React.FC = () => {
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           <Input
-            placeholder="Benutzernamen eingeben"
+            placeholder="Benutzername"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleJoin();
-              }
-            }}
             className="
-              bg-white/70 text-gray-800 placeholder-gray-500 
+              rounded bg-white/70 text-gray-800 placeholder-gray-500 
+              focus:bg-white focus:ring-2 focus:ring-purple-400 
+              transition-all duration-300 mb-2
+            "
+            required
+          />
+
+          <Input
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="
+              rounded bg-white/70 text-gray-800 placeholder-gray-500 
               focus:bg-white focus:ring-2 focus:ring-purple-400 
               transition-all duration-300
             "
+            required
           />
         </motion.div>
         <motion.div
@@ -64,7 +77,7 @@ const LandingPage: React.FC = () => {
           transition={{ delay: 0.6, duration: 0.4 }}
         >
           <Button
-            onClick={handleJoin}
+            type="submit"
             className="
               bg-purple-600 hover:bg-purple-700 text-white 
               px-5 py-2 rounded-full shadow-md 
@@ -75,8 +88,8 @@ const LandingPage: React.FC = () => {
           </Button>
         </motion.div>
       </motion.div>
-    </div>
+    </form>
   );
 };
 
-export default LandingPage;
+export default LoginPage;

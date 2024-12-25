@@ -1,14 +1,18 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './index.css';
-import LandingPage from './LandingPage';
-import ChatPage from './ChatPage';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import "./index.css";
+
+import LoginPage from "./components/LoginPage";
+import LandingPage from "./components/LandingPage";
+import ChatRoomPage from "./components/ChatRoomPage";
 
 const App: React.FC = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/chat-rooms" element={<LandingPage />} />
+      <Route path="/chat-room" element={<ChatRoomPage />} />
     </Routes>
   </BrowserRouter>
 );
