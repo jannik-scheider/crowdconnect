@@ -11,6 +11,8 @@ const {
   removeUser,
   getUser,
   getUsersInRoom,
+  assignRoomToUser,
+  removeRoomFromUser,
 } = require("./utils/users");
 const { createChatRoom, getChatRooms } = require("./utils/rooms");
 
@@ -25,13 +27,19 @@ const io = new Server(http, {
 io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
 
-  socket.on("getChatRoomsInfo", (callback) => {
-    const allChatRooms = getChatRooms();
+  socket.on("createUser", (username, callback) => {
+    console.log("createuser");
+    const { error } = addUser({ id: socket.id, username });
 
-    const response = allChatRooms.map((room) => ({
-      userCount: getUsersInRoom(room.name).length,
-      ...room,
-    }));
+    if (error) {
+      return callback(error);
+    }
+    callback();
+  });
+
+  socket.on("getChatRoomsInfo", (callback) => {
+    const response = _getChatRoomsInfo();
+
     response.forEach((item) => {
       console.log(item);
     });
@@ -44,21 +52,47 @@ io.on("connection", (socket) => {
     if (error) {
       return callback(error);
     }
+
+    const updatedChatRooms = _getChatRoomsInfo();
+    io.emit("updatedChatRooms", updatedChatRooms);
+
     callback();
   });
 
-  socket.on("joinChatRoom", (options, callback) => {
-    const { error, user } = addUser({ id: socket.id, ...options });
+  socket.on("joinChatRoom", (roomName, callback) => {
+    const { error, user } = assignRoomToUser(socket.id, roomName);
 
     if (error) {
-      return callback(error);
+      return callback("An error occurred when trying to join the chat room!");
     }
 
     socket.join(user.roomName);
 
-    console.log(`${user.username} has joined the chat.`);
+    console.log(`${user.username} has joined the chat room ${roomName}.`);
     // socket.emit('message', 'Welcome!')
     socket.broadcast.to(user.roomName).emit("userJoined", user.username);
+
+    const updatedChatRooms = _getChatRoomsInfo();
+    socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
+
+    callback();
+  });
+
+  socket.on("leaveChatRoom", (roomName, callback) => {
+    const { error, user } = removeRoomFromUser(socket.id, roomName);
+
+    if (error) {
+      return callback("An error occurred when trying to leave the chat room!");
+    }
+
+    socket.leave(user.roomName);
+
+    // TODO: Refactoring: io.to(user.room).emit('message', `${user.username} has left!`)
+    console.log(`${user.username} has left the chat room '${roomName}'.`);
+    socket.broadcast.to(roomName).emit("userLeft", user.username);
+
+    const updatedChatRooms = _getChatRoomsInfo();
+    socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
 
     callback();
   });
@@ -83,15 +117,24 @@ io.on("connection", (socket) => {
 
     const user = removeUser(socket.id);
 
-    if (user) {
-      console.log(`${user.username} has left the chat.`);
-      // TODO: Refactoring: io.to(user.room).emit('message', `${user.username} has left!`)
-      io.to(user.roomName).emit("userLeft", user.username);
+    if (!user) {
+      console.log(
+        `Could not delete user because the user with the ID '${socket.id}' was not found.`
+      );
     }
   });
 });
 
-// start server
+function _getChatRoomsInfo() {
+  const allChatRooms = getChatRooms();
+
+  return allChatRooms.map((room) => ({
+    userCount: getUsersInRoom(room.name).length,
+    ...room,
+  }));
+}
+
+// Start server
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
   console.log(`server runs on port ${PORT}`);

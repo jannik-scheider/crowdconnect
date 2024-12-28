@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { PlusIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowRightIcon,
+  ArrowLeftEndOnRectangleIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 
-import { socket } from "../socket";
+import { getSocket } from "../socket";
 import { Button } from "./ui/button";
 
 interface ChatRoomInfo {
@@ -19,37 +23,39 @@ const LandingPage: React.FC = () => {
   const [isCreateRoomDialogOpen, setIsCreateRoomDialogOpen] = useState(false);
   const [chatRoomName, setChatRoomName] = useState("");
   const [chatRooms, setChatRooms] = useState<ChatRoomInfo[]>([]);
+  const socket = getSocket();
   const navigate = useNavigate();
 
-  // Initialize Socket connection
   useEffect(() => {
-    socket.connect();
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    function onChatRoomsInfoEvent(roomInfos: ChatRoomInfo[]) {
-      setChatRooms(roomInfos);
+    if (!username) {
+      navigate("/");
     }
 
     socket.emit("getChatRoomsInfo", (roomsInfo: ChatRoomInfo[]) => {
+      console.log(roomsInfo);
       setChatRooms(roomsInfo);
     });
 
+    function onUpdatedChatRoomsEvent(roomInfos: ChatRoomInfo[]) {
+      setChatRooms(roomInfos);
+    }
+
+    socket.on("updatedChatRooms", onUpdatedChatRoomsEvent);
+
     // Cleanup beim Verlassen der Komponente
     return () => {
-      socket.off("chatRooms", onChatRoomsInfoEvent);
+      socket.off("updatedChatRooms", onUpdatedChatRoomsEvent);
+
+      //   socket.disconnect();
     };
   }, []);
 
   const handleCreateRoom = () => {
-    if (chatRoomName.trim() && socket) {
-      socket.emit("createChatRoom", chatRoomName, (error: any) => {
+    if (chatRoomName.trim()) {
+      socket.emit("createChatRoom", chatRoomName, (error: unknown) => {
         if (error) {
-          return alert(error);
+          alert(error);
+          return navigate("/");
         }
       });
       setIsCreateRoomDialogOpen(false);
@@ -57,18 +63,27 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  const handleJoinRoom = (roomName: string) => {
-    // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
-    navigate("/chat-room", { state: { username, roomName } });
+  const handleJoinChatRoom = (roomName: string) => {
+    socket.emit("joinChatRoom", roomName, (error: unknown) => {
+      if (error) {
+        alert(error);
+        return navigate("/");
+      }
+      // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
+      navigate("/chat-room", { state: { username, roomName } });
+    });
   };
 
-  const signOut = () => {};
+  const signOut = () => {
+    socket.disconnect();
+    navigate("/");
+  };
 
   // Farben
   const ownUserColor = "#ff9ff3";
 
   return (
-    <div className="h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-8">
+    <div className="h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 px-14 py-10">
       {/* Header */}
       <motion.div
         className="rounded flex items-center justify-between p-4 mb-8 bg-white/10"
@@ -85,37 +100,35 @@ const LandingPage: React.FC = () => {
             <span style={{ color: ownUserColor }}>{username}</span>
           </span>
           <Button
-            onClick={signOut}
             className="
                       bg-purple-400 hover:bg-purple-500 text-white
                       px-4 py-1 rounded-full shadow-md 
                       hover:scale-105 transition-transform duration-300 text-sm
                       "
+            onClick={signOut}
           >
-            Sign out
+            <ArrowLeftEndOnRectangleIcon strokeWidth={2.5} />
+            <span className="leading-none">Ausloggen</span>
           </Button>
         </div>
       </motion.div>
 
       <div className="flex justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-4 text-gray-100">Chat rooms</h1>
-          <p className="text-gray-100 text-lg mb-5">
-            Here is an overview of all chat rooms...
-          </p>
+          <h1 className="text-3xl font-bold text-gray-100">
+            Chat rooms ({chatRooms.length})
+          </h1>
         </div>
 
         <Button
           className="
-                    bg-purple-400 hover:bg-purple-500 text-white
-                    rounded-full shadow-md h-12 my-4
-                    hover:scale-105 transition-transform duration-300 text-sm
-                "
+            bg-purple-400 hover:bg-purple-500 text-white rounded-full shadow-md h-12 my-2
+            hover:scale-105 transition-transform duration-300 text-sm
+          "
           onClick={() => setIsCreateRoomDialogOpen(true)}
-          title="Create chat room"
         >
-          <PlusIcon />
-          Create room
+          <PlusIcon strokeWidth={2.5} />
+          <span className="leading-none">Chatroom erstellen</span>
         </Button>
 
         {/* Dialog */}
@@ -133,7 +146,7 @@ const LandingPage: React.FC = () => {
                   }
                 }}
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300 mb-4"
-                placeholder="Gib deine Raumnummer ein"
+                placeholder="Gib deinen Raumnamen ein"
               />
               <div className="flex justify-end space-x-2">
                 {/* Abbrechen Button */}
@@ -157,7 +170,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Container */}
-      <div className="flex p-4">
+      <div className="flex">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -180,7 +193,7 @@ const LandingPage: React.FC = () => {
                 {room.name}
               </h2>
               <p className="text-gray-100 text-lg mb-5">
-                Users: {room.userCount}
+                Benutzer: {room.userCount}
               </p>
 
               <Button
@@ -189,9 +202,10 @@ const LandingPage: React.FC = () => {
                     px-4 py-1 rounded-full shadow-md 
                     hover:scale-105 transition-transform duration-300 text-sm
                 "
-                onClick={() => handleJoinRoom(room.name)}
+                onClick={() => handleJoinChatRoom(room.name)}
               >
-                Join
+                <ArrowRightIcon strokeWidth={2.5} />
+                <span className="leading-none">Beitreten</span>
               </Button>
             </motion.div>
           ))}

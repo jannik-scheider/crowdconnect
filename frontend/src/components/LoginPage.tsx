@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { motion } from "framer-motion";
+import { getSocket } from "../socket";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
+  const socket = getSocket();
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -15,15 +19,35 @@ const LoginPage: React.FC = () => {
   //   setIsFormValid(isValid);
   // }, [username, roomName]);
 
-  const handleJoin = (event: React.FormEvent<HTMLFormElement>) => {
+  // Initialize Socket connection
+  useEffect(() => {
+    socket.connect();
+
+    socket.on("connect", () => {
+      console.log("Connected with ID:", socket.id);
+    });
+
+    // return () => {
+    //   socket.disconnect();
+    // };
+  }, []);
+
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate("/chat-rooms", { state: { username } });
+
+    socket.emit("createUser", username, (error: unknown) => {
+      if (error) {
+        alert(error);
+        return navigate("/");
+      }
+      navigate("/chat-rooms", { state: { username } });
+    });
   };
 
   return (
     <form
       className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4"
-      onSubmit={handleJoin}
+      onSubmit={handleLogin}
     >
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -84,7 +108,7 @@ const LoginPage: React.FC = () => {
               hover:scale-105 transition-transform duration-300
             "
           >
-            Beitreten
+            Login
           </Button>
         </motion.div>
       </motion.div>

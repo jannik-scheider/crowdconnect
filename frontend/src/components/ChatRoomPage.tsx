@@ -3,10 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeftIcon } from "@heroicons/react/24/solid";
-import { ChevronRightIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/solid";
 
-import { socket } from "../socket";
+import { getSocket } from "../socket";
+import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
 
 interface Message {
   username: string;
@@ -21,16 +25,13 @@ const ChatRoomPage: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const socket = getSocket();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Benutzer tritt Chatroom bei
-    socket.emit("joinChatRoom", { username, roomName }, (error: any) => {
-      if (error) {
-        alert(error);
-        return navigate("/chat-rooms", { state: { username } });
-      }
-    });
+    if (!username || !roomName) {
+      navigate("/");
+    }
 
     function onChatMessageEvent(message: Message) {
       setMessages((prev) => [
@@ -66,7 +67,7 @@ const ChatRoomPage: React.FC = () => {
       socket.off("userJoined", onUserJoinedEvent);
       socket.off("userLeft", onUserLeftEvent);
 
-      socket.disconnect();
+      //   socket.disconnect();
     };
   }, []);
 
@@ -79,20 +80,28 @@ const ChatRoomPage: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleRoomClick = (id: string) => {
-    // TODO...
-  };
-
   const sendMessage = () => {
-    if (message.trim() && socket) {
+    if (message.trim()) {
       socket.emit("chatMessage", message);
       setMessage("");
     }
   };
 
-  const leaveChat = () => {
+  const leaveChatRoom = () => {
+    socket.emit("leaveChatRoom", roomName, (error: unknown) => {
+      if (error) {
+        alert(error);
+        return navigate("/");
+      }
+      console.log("test");
+      // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
+      navigate("/chat-rooms", { state: { username } });
+    });
+  };
+
+  const signOut = () => {
     socket.disconnect();
-    return navigate("/chat-rooms", { state: { username } });
+    navigate("/");
   };
 
   // Farben
@@ -113,11 +122,11 @@ const ChatRoomPage: React.FC = () => {
         animate={{ opacity: 0.875 }}
         transition={{ duration: 0.1 }}
         className={`${
-          isSidebarOpen ? "w-64" : "w-40"
+          isSidebarOpen ? "w-64" : "w-48"
         } rounded h-full p-4 mr-4 bg-gray-800 text-white transition-all duration-300`}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Rooms</h2>
+          <h2 className="text-xl font-bold">Empfohlene Chatrooms</h2>
           <button
             className="bg-gray-700 hover:bg-gray-600 rounded p-1.5"
             title={isSidebarOpen ? "Sidebar einklappen" : "Sidebar ausklappen"}
@@ -133,28 +142,13 @@ const ChatRoomPage: React.FC = () => {
 
         <ul>
           <li className="mb-4 hover:bg-gray-700 p-2 rounded">
-            <button
-              className="w-full text-left"
-              onClick={() => handleRoomClick("Room1")}
-            >
-              Room1
-            </button>
+            <button className="w-full text-left">Room1</button>
           </li>
           <li className="mb-4 hover:bg-gray-700 p-2 rounded">
-            <button
-              className="w-full text-left"
-              onClick={() => handleRoomClick("Room2")}
-            >
-              Room2
-            </button>
+            <button className="w-full text-left">Room2</button>
           </li>
           <li className="mb-4 hover:bg-gray-700 p-2 rounded">
-            <button
-              className="w-full text-left"
-              onClick={() => handleRoomClick("Room3")}
-            >
-              Room3
-            </button>
+            <button className="w-full text-left">Room3</button>
           </li>
         </ul>
       </motion.div>
@@ -178,22 +172,26 @@ const ChatRoomPage: React.FC = () => {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-xl font-semibold text-white drop-shadow">
-            Live Chat
+            Chat Room "{roomName}"
           </h2>
           <div className="flex items-center space-x-4">
             <span className="text-white/80 text-sm italic">
               Eingeloggt als:{" "}
               <span style={{ color: ownUserColor }}>{username}</span>
             </span>
-            <Button
-              onClick={leaveChat}
-              className="
-                bg-purple-400 hover:bg-purple-500 text-white
-                px-4 py-1 rounded-full shadow-md 
-                hover:scale-105 transition-transform duration-300 text-sm
-                "
-            >
-              Verlassen
+
+            <div className="h-7 w-px bg-gray-300"></div>
+
+            <Button variant="link" onClick={leaveChatRoom}>
+              <ArrowLeftIcon strokeWidth={2.5} />
+              <span className="leading-none" title="Zur Chatroom-Übersicht">
+                Verlassen
+              </span>
+            </Button>
+
+            <Button variant="link" onClick={signOut}>
+              <ArrowLeftEndOnRectangleIcon strokeWidth={2.5} />
+              <span className="leading-none">Ausloggen</span>
             </Button>
           </div>
         </motion.div>
@@ -267,14 +265,7 @@ const ChatRoomPage: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
           >
-            <Button
-              onClick={sendMessage}
-              className="
-                bg-purple-600 hover:bg-purple-700 text-white 
-                px-5 py-2 rounded-full shadow-md 
-                hover:scale-105 transition-transform duration-300
-              "
-            >
+            <Button variant="default" onClick={sendMessage}>
               Senden
             </Button>
           </motion.div>

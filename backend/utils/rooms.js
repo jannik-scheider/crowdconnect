@@ -29,13 +29,18 @@ const createChatRoom = (roomName) => {
 
   // Store room
   const room = { name: roomName };
-  rooms.push({ name: roomName });
+  rooms.push(room);
   return { room };
+};
+
+const getChatRoom = (roomName) => {
+  return rooms.find((room) => room.name === roomName);
 };
 
 const getChatRooms = () => rooms;
 
 module.exports = {
   createChatRoom,
+  getChatRoom,
   getChatRooms,
 };
