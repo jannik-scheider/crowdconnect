@@ -1,0 +1,8 @@
+{
+    "yaml.schemas": {
+        "https://www.artillery.io/schema.json": [
+            "file:///c%3A/Users/janni/git/live-chat/loadtest.yml",
+            "file:///c%3A/Users/janni/git/live-chat/backend/loadtest.yml"
+        ]
+    }
+}

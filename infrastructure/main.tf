@@ -212,6 +212,17 @@ resource "aws_ecs_task_definition" "live_chat_task" {
           hostPort      = 3000
           protocol      = "tcp"
         }
+      ],
+      environment = [
+        {
+          # z.B. Output aus "redis_endpoint" => "redis://<ENDPOINT>:6379"
+          name  = "REDIS_URL"
+          value = "redis://${aws_elasticache_cluster.redis_cluster.cache_nodes[0].address}:6379"
+        },
+        {
+          name  = "FRONTEND_URL"
+          value = "https://crowdconnect.fun"
+        }
       ]
     }
   ])
@@ -391,4 +402,66 @@ data "aws_iam_policy_document" "cloudfront_oac_access" {
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.id
   policy = data.aws_iam_policy_document.cloudfront_oac_access.json
+}
+
+
+
+
+##################################
+#                                 
+# Redis implementierung
+#
+##################################
+
+
+resource "aws_elasticache_subnet_group" "redis_subnet_group" {
+  name        = "redis-subnet-group"
+  description = "Subnet group for Redis"
+
+  subnet_ids = [
+    aws_subnet.private_subnet_a.id,
+    aws_subnet.private_subnet_b.id
+  ]
+}
+
+
+resource "aws_security_group" "redis_sg" {
+  name   = "redis-sg"
+  vpc_id = aws_vpc.live_chat_vpc.id
+
+  ingress {
+    description     = "Allow inbound from ECS Service SG on Redis port"
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    # Aus Sicherheitsgründen direkt die SG deines ECS-Services angeben
+    security_groups = [aws_security_group.live_chat_service_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "redis-sg"
+  }
+}
+
+
+resource "aws_elasticache_cluster" "redis_cluster" {
+  cluster_id           = "live-chat-redis-cluster"
+  engine               = "redis"
+  engine_version       = "6.2"
+  node_type            = "cache.t3.micro"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis6.x"
+  subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
+  security_group_ids   = [aws_security_group.redis_sg.id]
+
+  tags = {
+    Name = "live-chat-redis"
+  }
 }

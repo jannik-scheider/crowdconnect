@@ -2,23 +2,30 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const { Server } = require('socket.io');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { Redis } = require('ioredis');
 require('dotenv').config();
 
+// Redis-Verbindung einrichten
+const pubClient = new Redis({
+  url: process.env.REDIS_URL // z.B. "redis://live-chat-redis-cluster.xxxxxx.ng.0001.use1.cache.amazonaws.com:6379"
+});
+const subClient = pubClient.duplicate();
 
+// Socket.io mit Redis-Adapter konfigurieren
 const io = new Server(http, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true
   }
 });
+io.adapter(createAdapter(pubClient, subClient));
 
-
-
+// Socket.io Events
 io.on('connection', (socket) => {
   let username;
-
-  console.log(`new websocket connection: ${socket.id}`);
+  console.log(`Client ${socket.id} connected to process ${process.pid}`);
 
   socket.on('joinChat', (name) => {
     if (!username) {
@@ -29,7 +36,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chatMessage', (msg) => {
-    console.log(`message from ${username}: ${msg}`);
+    console.log(`Process ${process.pid} received message from ${username}: ${msg}`);
+    console.log(`Process ${process.pid} received message from ${username}: ${JSON.stringify(msg)}`);
     io.emit('chatMessage', { username: username, message: msg });
   });
 
@@ -42,9 +50,8 @@ io.on('connection', (socket) => {
   });
 });
 
-
-// start server
+// Server starten
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
-    console.log(`server runs on port ${PORT}`);
+  console.log(`server runs on port ${PORT}`);
 });

@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:3000"  # URL deines Backends
+  phases:
+    - duration: 30                # Testlaufzeit in Sekunden
+      arrivalRate: 10             # 10 Benutzer pro Sekunde
+  engines:
+    socketio-v3: {}   
+
+scenarios:
+  - name: "Chat Load Test"
+    engine: socketio-v3
+    flow:
+      - emit:
+          channel: "joinChat"     # Sende das Event 'joinChat'
+          data: "username"  # Zufälliger Benutzername
+      - think: 2                  # Warte 2 Sekunden
+      - emit:
+          channel: "chatMessage"  # Sende eine Nachricht
+          data:
+            username: "username"
+            message: "Hallo von Benutzer username!"
+      - think: 1                  # Warte 1 Sekunde
