@@ -8,13 +8,18 @@ require("dotenv").config();
 
 const {
   addUser,
-  removeUser,
-  getUser,
+  deleteUser,
+  getUserById,
   getUsersInRoom,
   assignRoomToUser,
   removeRoomFromUser,
+  getUsers,
 } = require("./utils/users");
-const { createChatRoom, getChatRooms } = require("./utils/rooms");
+const {
+  createChatRoom,
+  deleteChatRoom,
+  getChatRooms,
+} = require("./utils/rooms");
 
 const io = new Server(http, {
   cors: {
@@ -28,11 +33,11 @@ io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
 
   socket.on("createUser", (username, callback) => {
-    console.log("createuser");
     const { error } = addUser({ id: socket.id, username });
 
     if (error) {
-      return callback(error);
+      console.error("Creating user failed:", error.cause);
+      return callback(error.userMessage);
     }
     callback();
   });
@@ -40,17 +45,33 @@ io.on("connection", (socket) => {
   socket.on("getChatRoomsInfo", (callback) => {
     const response = _getChatRoomsInfo();
 
-    response.forEach((item) => {
-      console.log(item);
-    });
     callback(response);
   });
 
   socket.on("createChatRoom", (roomName, callback) => {
-    const { error } = createChatRoom(roomName);
+    const { error } = createChatRoom(socket.id, roomName);
 
     if (error) {
-      return callback(error);
+      console.error("Creating chat room failed:", error.cause);
+      return callback(error.message);
+    }
+
+    const updatedChatRooms = _getChatRoomsInfo();
+    io.emit("updatedChatRooms", updatedChatRooms);
+
+    callback();
+  });
+
+  socket.on("deleteChatRoom", (roomName, callback) => {
+    const room = deleteChatRoom(roomName);
+
+    if (!room) {
+      console.error(
+        `Could not delete room because the room with the name '${roomName}' was not found.`
+      );
+      callback(
+        "An unexpected error occured when trying to delete the chat room."
+      );
     }
 
     const updatedChatRooms = _getChatRoomsInfo();
@@ -63,7 +84,8 @@ io.on("connection", (socket) => {
     const { error, user } = assignRoomToUser(socket.id, roomName);
 
     if (error) {
-      return callback("An error occurred when trying to join the chat room!");
+      console.error("Joining chat room failed:", error.cause);
+      return callback(error.userMessage);
     }
 
     socket.join(user.roomName);
@@ -82,7 +104,8 @@ io.on("connection", (socket) => {
     const { error, user } = removeRoomFromUser(socket.id, roomName);
 
     if (error) {
-      return callback("An error occurred when trying to leave the chat room!");
+      console.error("Leaving chat room failed:", error.cause);
+      return callback(error.userMessage);
     }
 
     socket.leave(user.roomName);
@@ -98,7 +121,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chatMessage", (message) => {
-    const user = getUser(socket.id);
+    const user = getUserById(socket.id);
 
     if (!user) {
       return;
@@ -115,11 +138,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`websocket connection disconnected: ${socket.id}`);
 
-    const user = removeUser(socket.id);
+    const user = deleteUser(socket.id);
 
     if (!user) {
-      console.log(
-        `Could not delete user because the user with the ID '${socket.id}' was not found.`
+      console.error(
+        `Could not delete user because the user with the Socket ID '${socket.id}' was not found.`
       );
     }
   });

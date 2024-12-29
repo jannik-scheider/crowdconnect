@@ -15,17 +15,37 @@ const addUser = ({ id, username }) => {
   // Validate the data
   if (!username) {
     return {
-      error: "Username is required!",
+      error: {
+        userMessage: "Username is required for login!",
+        cause: "Cannot create user when the given username is empty.",
+      },
     };
   }
 
   // Check for existing user
-  const existingUser = getUser(id);
+  const existingUser = getUserById(id);
 
   // Validate username
   if (existingUser) {
     return {
-      error: "Username is already in use!",
+      error: {
+        userMessage:
+          "An unexpected error occurred during the login attempt. Please refresh the page and try again.",
+        cause: `Cannot create user because a user with the ID ${id} does already exist.`,
+      },
+    };
+  }
+
+  // Check for existing username
+  const existingUsername = !!getUserByUsername(username);
+
+  if (existingUsername) {
+    return {
+      error: {
+        userMessage:
+          "Username is already in use! Please choose another username.",
+        cause: `Cannot create user because a user with the username ${username} does already exist.`,
+      },
     };
   }
 
@@ -35,7 +55,7 @@ const addUser = ({ id, username }) => {
   return { user };
 };
 
-const removeUser = (userId) => {
+const deleteUser = (userId) => {
   const index = users.findIndex((user) => user.id === userId);
 
   if (index !== -1) {
@@ -47,26 +67,27 @@ const assignRoomToUser = (userId, roomName) => {
   // Validate the data
   if (!userId || !roomName) {
     return {
-      error: "User ID and room name are required!",
+      error: {
+        userMessage:
+          "An unexpected error occurred when trying to join the chat room. Please refresh the page and try again.",
+        cause: `Cannot assign room '${roomName}' to the user with the ID ${userId} because either the given user id or username is empty.`,
+      },
     };
   }
 
   // Clean the data
   roomName = roomName.trim().toLowerCase();
 
-  const user = getUser(userId);
+  const user = getUserById(userId);
   const existingRoom = getChatRoom(roomName);
 
   if (!user || !existingRoom) {
-    if (!user) {
-      console.error(`Error: User with ID '${userId}' does not exist!`);
-    }
-    if (!existingRoom) {
-      console.error(`Error: Room with name '${userId}' does not exist!`);
-    }
-
     return {
-      error: `An error occurred when trying to assign the chat room to the user!`,
+      error: {
+        userMessage:
+          "An unexpected error occurred when trying to join the chat room. Please refresh the page and try again.",
+        cause: `Cannot assign room '${roomName}' to the user with the ID '${userId}' because either the user with the ID '${id}' or the room with the room name '${roomName}' does not exist.`,
+      },
     };
   }
 
@@ -79,26 +100,26 @@ const removeRoomFromUser = (userId, roomName) => {
   // Validate the data
   if (!userId || !roomName) {
     return {
-      error: "User ID and room name are required!",
+      error: {
+        userMessage:
+          "An unexpected error occurred. Please refresh the page and try again.",
+        cause: `Cannot remove room '${roomName}' from the user with the ID '${id}' because either the given user ID or room name is empty.`,
+      },
     };
   }
 
   // Clean the data
   roomName = roomName.trim().toLowerCase();
 
-  const user = getUser(userId);
-  const existingRoom = getChatRoom(roomName);
+  const user = getUserById(userId);
 
-  if (!user || !existingRoom) {
-    if (!user) {
-      console.error(`Error: User with ID '${userId}' does not exist!`);
-    }
-    if (!existingRoom) {
-      console.error(`Error: Room with name '${userId}' does not exist!`);
-    }
-
+  if (!user) {
     return {
-      error: `An error occurred when trying to remove the chat room from the user!`,
+      error: {
+        userMessage:
+          "An unexpected error occurred during signout. Please refresh the page and try again.",
+        cause: `Cannot remove room '${roomName}' from the user with the ID '${id}' because the user with the ID '${id}' does not exist.`,
+      },
     };
   }
 
@@ -109,9 +130,12 @@ const removeRoomFromUser = (userId, roomName) => {
 
 const getUsers = () => users;
 
-const getUser = (userId) => {
-  console.log("users", users);
+const getUserById = (userId) => {
   return users.find((user) => user.id === userId);
+};
+
+const getUserByUsername = (username) => {
+  return users.find((user) => user.username === username);
 };
 
 const getUsersInRoom = (roomName) => {
@@ -120,10 +144,11 @@ const getUsersInRoom = (roomName) => {
 
 module.exports = {
   addUser,
-  removeUser,
+  deleteUser,
   assignRoomToUser,
   removeRoomFromUser,
   getUsers,
-  getUser,
+  getUserById,
+  getUserByUsername,
   getUsersInRoom,
 };

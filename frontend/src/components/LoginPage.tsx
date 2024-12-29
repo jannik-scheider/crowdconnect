@@ -8,16 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
+  // const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const socket = getSocket();
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const isValid = username.trim() !== "" && roomName.trim() !== "";
-  //   setIsFormValid(isValid);
-  // }, [username, roomName]);
 
   // Initialize Socket connection
   useEffect(() => {
@@ -34,11 +28,13 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrorMessage("");
 
-    socket.emit("createUser", username, (error: unknown) => {
-      if (error) {
-        alert(error);
-        return navigate("/");
+    const username = event.currentTarget.username.value;
+
+    socket.emit("createUser", username, (errorMessage: string) => {
+      if (errorMessage) {
+        return setErrorMessage(errorMessage);
       }
       navigate("/chat-rooms", { state: { username } });
     });
@@ -65,25 +61,31 @@ const LoginPage: React.FC = () => {
         >
           Willkommen zu CrowdConnect!
         </motion.h1>
+
         <motion.div
           className="w-full"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
+          {errorMessage && (
+            <div className="error-message bg-red-100 text-red-600 px-2 py-1.5 mb-3 w-full rounded leading-[1.35]">
+              {errorMessage}
+            </div>
+          )}
+
           <Input
             placeholder="Benutzername"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
             className="
               rounded bg-white/70 text-gray-800 placeholder-gray-500 
               focus:bg-white focus:ring-2 focus:ring-purple-400 
               transition-all duration-300 mb-2
             "
+            name="username"
             required
           />
 
-          <Input
+          {/* <Input
             placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -92,8 +94,9 @@ const LoginPage: React.FC = () => {
               focus:bg-white focus:ring-2 focus:ring-purple-400 
               transition-all duration-300
             "
+            name="password"
             required
-          />
+          /> */}
         </motion.div>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
