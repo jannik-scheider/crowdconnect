@@ -8,9 +8,20 @@ require('dotenv').config();
 
 // Redis-Verbindung einrichten
 const pubClient = new Redis({
-  url: process.env.REDIS_URL // z.B. "redis://live-chat-redis-cluster.xxxxxx.ng.0001.use1.cache.amazonaws.com:6379"
+ host: process.env.REDIS_ENDPOINT, port: 6379 // z.B. "redis://live-chat-redis-cluster.xxxxxx.ng.0001.use1.cache.amazonaws.com:6379"
 });
 const subClient = pubClient.duplicate();
+
+
+// Nach der Erstellung des Redis-Clients
+pubClient.on("error", (err) => {
+  console.error("[Redis pubClient Error]:", err);
+});
+
+subClient.on("error", (err) => {
+  console.error("[Redis subClient Error]:", err);
+});
+
 
 // Socket.io mit Redis-Adapter konfigurieren
 const io = new Server(http, {
