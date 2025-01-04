@@ -5,6 +5,7 @@ const { Server } = require("socket.io");
 const { createAdapter } = require('@socket.io/redis-adapter');
 const { Redis } = require('ioredis');
 require("dotenv").config();
+const os = require('os');
 
 // import { ChatRoom } from "./utils/rooms";
 
@@ -142,13 +143,14 @@ io.on("connection", (socket) => {
 
   socket.on("chatMessage", (message) => {
     const user = getUserById(socket.id);
+    const hostname = os.hostname();
 
     if (!user) {
       return;
     }
 
     console.log(`message from ${user.username}: ${message}`);
-
+    message = message + " hello" + hostname
     io.to(user.roomName).emit("chatMessage", {
       username: user.username,
       message,
