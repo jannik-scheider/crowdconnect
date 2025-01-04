@@ -177,6 +177,16 @@ function _getChatRoomsInfo() {
   }));
 }
 
+app.get('/health', (req, res) => {
+  const redisStatus = pubClient.status === 'ready';
+  if (!redisStatus) {
+      return res.status(500).send('Redis is not ready');
+  }
+
+  res.status(200).send('OK');
+});
+
+
 // Start server
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {

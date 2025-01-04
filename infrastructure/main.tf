@@ -163,12 +163,12 @@ resource "aws_security_group" "alb_sg" {
 # ECS Service Security Group (live_chat_service_sg): Erlaubt eingehenden Traffic nur von der ALB-SG auf Port 3000. Kein direkter Zugriff aus dem Internet.
 resource "aws_security_group" "live_chat_service_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
-  
+
   ingress {
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]  # ALB SG als Quelle
+    security_groups = [aws_security_group.alb_sg.id] # ALB SG als Quelle
   }
 
   egress {
@@ -188,6 +188,11 @@ resource "aws_security_group" "live_chat_service_sg" {
 # 5. ECS Cluster
 resource "aws_ecs_cluster" "live_chat_cluster" {
   name = "live-chat-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enhanced"
+  }
 }
 
 # 6. Task-Definition
@@ -248,9 +253,18 @@ resource "aws_lb_target_group" "live_chat_target" {
   vpc_id      = aws_vpc.live_chat_vpc.id
   target_type = "ip"
 
+  health_check {
+    path                = "/health" # Endpunkt für den Health Check
+    interval            = 30        # Zeit zwischen Prüfungen in Sekunden
+    timeout             = 5         # Zeit in Sekunden, bevor ein Check fehlschlägt
+    healthy_threshold   = 3         # Anzahl erfolgreicher Checks, um "healthy" zu werden
+    unhealthy_threshold = 2         # Anzahl fehlgeschlagener Checks, um "unhealthy" zu werden
+    matcher             = "200"     # Erwarteter HTTP-Statuscode
+  }
+
   stickiness {
-    type            = "lb_cookie"    
-    cookie_duration = 3600        
+    type            = "lb_cookie"
+    cookie_duration = 3600
   }
 }
 
@@ -297,11 +311,11 @@ resource "aws_ecs_service" "live_chat_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [
+    subnets = [
       aws_subnet.private_subnet_a.id,
       aws_subnet.private_subnet_b.id
     ]
-    security_groups = [aws_security_group.live_chat_service_sg.id]
+    security_groups  = [aws_security_group.live_chat_service_sg.id]
     assign_public_ip = false
   }
 
@@ -311,8 +325,8 @@ resource "aws_ecs_service" "live_chat_service" {
     container_port   = 3000
   }
 
-  depends_on = [aws_lb_listener.live_chat_https_listener, 
-  aws_lb_listener.live_chat_http_listener
+  depends_on = [aws_lb_listener.live_chat_https_listener,
+    aws_lb_listener.live_chat_http_listener
   ]
 }
 
@@ -334,8 +348,8 @@ locals {
   s3_bucket_name = "sys-crowdconnect-scheider"
   domain         = "crowdconnect.fun"
   hosted_zone_id = "Z080884724KY8PB2MXITF"
-  us_cert_arn       = "arn:aws:acm:us-east-1:522814722868:certificate/697927e5-9734-4a1a-b5be-23b65a487b95"
-  eu_cert_arn = "arn:aws:acm:eu-central-1:522814722868:certificate/bea0afbf-6f4b-4d7b-abc8-e5210bfeee65"
+  us_cert_arn    = "arn:aws:acm:us-east-1:522814722868:certificate/697927e5-9734-4a1a-b5be-23b65a487b95"
+  eu_cert_arn    = "arn:aws:acm:eu-central-1:522814722868:certificate/bea0afbf-6f4b-4d7b-abc8-e5210bfeee65"
 }
 
 resource "aws_s3_bucket" "main" {
@@ -369,8 +383,8 @@ resource "aws_cloudfront_distribution" "main" {
 
   # Default Cache Behavior
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    cached_methods  = ["GET", "HEAD", "OPTIONS"]
 
     # Use a managed cache policy (example: CachingOptimized)...
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
@@ -398,8 +412,8 @@ resource "aws_cloudfront_distribution" "main" {
 
   viewer_certificate {
     acm_certificate_arn      = local.us_cert_arn
-    minimum_protocol_version  = "TLSv1.2_2021"
-    ssl_support_method        = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
+    ssl_support_method       = "sni-only"
   }
 }
 
@@ -462,10 +476,10 @@ resource "aws_security_group" "redis_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
   ingress {
-    description     = "Allow inbound from ECS Service SG on Redis port"
-    from_port       = 6379
-    to_port         = 6379
-    protocol        = "tcp"
+    description = "Allow inbound from ECS Service SG on Redis port"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
     # Aus Sicherheitsgründen direkt die SG deines ECS-Services angeben
     security_groups = [aws_security_group.live_chat_service_sg.id]
   }
