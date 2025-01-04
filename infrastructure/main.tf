@@ -212,6 +212,17 @@ resource "aws_ecs_task_definition" "live_chat_task" {
           hostPort      = 3000
           protocol      = "tcp"
         }
+      ],
+      environment = [
+        {
+          # z.B. Output aus "redis_endpoint" => "redis://<ENDPOINT>:6379"
+          name  = "REDIS_ENDPOINT"
+          value = "${aws_elasticache_cluster.redis_cluster.cache_nodes[0].address}"
+        },
+        {
+          name  = "FRONTEND_URL"
+          value = "https://crowdconnect.fun"
+        }
       ]
     }
   ])
@@ -236,7 +247,13 @@ resource "aws_lb_target_group" "live_chat_target" {
   protocol    = "HTTP"
   vpc_id      = aws_vpc.live_chat_vpc.id
   target_type = "ip"
+
+  stickiness {
+    type            = "lb_cookie"    
+    cookie_duration = 3600        
+  }
 }
+
 
 
 resource "aws_lb_listener" "live_chat_http_listener" {
@@ -325,7 +342,24 @@ resource "aws_s3_bucket" "main" {
   bucket = local.s3_bucket_name
 }
 
+# 1) The custom Origin Request Policy that forwards all cookies
+resource "aws_cloudfront_origin_request_policy" "forward_all_cookies" {
+  name = "forward-all-cookies"
 
+  cookies_config {
+    cookie_behavior = "all"
+  }
+
+  headers_config {
+    header_behavior = "none"
+  }
+
+  query_strings_config {
+    query_string_behavior = "all"
+  }
+}
+
+# 2) Updated CloudFront distribution
 resource "aws_cloudfront_distribution" "main" {
   aliases             = [local.domain]
   default_root_object = "index.html"
@@ -333,14 +367,23 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   wait_for_deployment = true
 
+  # Default Cache Behavior
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
-    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+
+    # Use a managed cache policy (example: CachingOptimized)...
+    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+
+    # ...and attach your custom origin request policy to forward cookies.
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.forward_all_cookies.id
+
+    # The ID of the origin to which you want to forward requests
     target_origin_id       = aws_s3_bucket.main.bucket
     viewer_protocol_policy = "redirect-to-https"
   }
 
+  # Your existing S3 origin
   origin {
     domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
@@ -355,8 +398,8 @@ resource "aws_cloudfront_distribution" "main" {
 
   viewer_certificate {
     acm_certificate_arn      = local.us_cert_arn
-    minimum_protocol_version = "TLSv1.2_2021"
-    ssl_support_method       = "sni-only"
+    minimum_protocol_version  = "TLSv1.2_2021"
+    ssl_support_method        = "sni-only"
   }
 }
 
@@ -391,4 +434,66 @@ data "aws_iam_policy_document" "cloudfront_oac_access" {
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.id
   policy = data.aws_iam_policy_document.cloudfront_oac_access.json
+}
+
+
+
+
+##################################
+#                                 
+# Redis implementierung
+#
+##################################
+
+
+resource "aws_elasticache_subnet_group" "redis_subnet_group" {
+  name        = "redis-subnet-group"
+  description = "Subnet group for Redis"
+
+  subnet_ids = [
+    aws_subnet.private_subnet_a.id,
+    aws_subnet.private_subnet_b.id
+  ]
+}
+
+
+resource "aws_security_group" "redis_sg" {
+  name   = "redis-sg"
+  vpc_id = aws_vpc.live_chat_vpc.id
+
+  ingress {
+    description     = "Allow inbound from ECS Service SG on Redis port"
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    # Aus Sicherheitsgründen direkt die SG deines ECS-Services angeben
+    security_groups = [aws_security_group.live_chat_service_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "redis-sg"
+  }
+}
+
+
+resource "aws_elasticache_cluster" "redis_cluster" {
+  cluster_id           = "live-chat-redis-cluster"
+  engine               = "redis"
+  engine_version       = "6.2"
+  node_type            = "cache.t3.micro"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis6.x"
+  subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
+  security_group_ids   = [aws_security_group.redis_sg.id]
+
+  tags = {
+    Name = "live-chat-redis"
+  }
 }
