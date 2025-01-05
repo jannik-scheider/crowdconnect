@@ -42,6 +42,7 @@ const LandingPage: React.FC = () => {
     });
 
     function onUpdatedChatRoomsEvent(roomInfos: ChatRoomInfo[]) {
+      console.log("updated rooms", roomInfos);
       setChatRooms(roomInfos);
     }
 
@@ -61,11 +62,15 @@ const LandingPage: React.FC = () => {
         if (errorMessage) {
           return setCreateChatRoomErrorMessage(errorMessage);
         }
-        setIsCreateChatRoomDialogOpen(false);
-        setCreateChatRoomErrorMessage("");
-        setChatRoomName("");
+        resetCreateChatRoomDialog();
       });
     }
+  };
+
+  const resetCreateChatRoomDialog = () => {
+    setIsCreateChatRoomDialogOpen(false);
+    setCreateChatRoomErrorMessage("");
+    setChatRoomName("");
   };
 
   const handleJoinChatRoom = (roomName: string) => {
@@ -170,18 +175,23 @@ const LandingPage: React.FC = () => {
               placeholder="Gib den Namen deines Chatrooms ein"
               required
             />
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-2 mt-2">
               {/* Abbrechen Button */}
               <button
-                onClick={() => setIsCreateChatRoomDialogOpen(false)}
+                onClick={resetCreateChatRoomDialog}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
                 Abbrechen
               </button>
+
               {/* Bestätigen Button */}
               <button
                 onClick={handleCreateChatRoom}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                disabled={!!createChatRoomErrorMessage}
+                className="
+                  px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600
+                  disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70
+                "
               >
                 Bestätigen
               </button>
@@ -204,18 +214,25 @@ const LandingPage: React.FC = () => {
               className="
                 flex flex-col justify-between
                 rounded w-72 h-48 p-4
-                bg-white/20 backdrop-blur-md rounded-xl shadow-lg  
+                bg-white/20 backdrop-blur-md rounded-xl shadow-lg
+                cursor-default  
                 "
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-xl font-semibold text-white drop-shadow truncate">
+              <h2
+                title={room.name}
+                className="text-xl font-semibold text-white drop-shadow truncate"
+              >
                 {room.name}
               </h2>
-              <p className="text-gray-100 text-lg mb-5">
-                Benutzer: {room.userCount}
-              </p>
+
+              {room.userCount !== null && (
+                <p className="text-gray-100 text-lg mb-5">
+                  {room.userCount} Benutzer
+                </p>
+              )}
 
               <div className="flex gap-x-2">
                 <Button

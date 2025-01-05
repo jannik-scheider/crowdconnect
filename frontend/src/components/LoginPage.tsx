@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 
 const LoginPage: React.FC = () => {
   // const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const socket = getSocket();
   const navigate = useNavigate();
@@ -28,11 +29,15 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setIsSubmitting(true);
     setErrorMessage("");
 
     const username = event.currentTarget.username.value;
 
     socket.emit("createUser", username, (errorMessage: string) => {
+      setIsSubmitting(false);
+
       if (errorMessage) {
         return setErrorMessage(errorMessage);
       }
@@ -105,13 +110,15 @@ const LoginPage: React.FC = () => {
         >
           <Button
             type="submit"
+            disabled={isSubmitting}
             className="
               bg-purple-600 hover:bg-purple-700 text-white 
               px-5 py-2 rounded-full shadow-md 
               hover:scale-105 transition-transform duration-300
+              disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70
             "
           >
-            Login
+            {isSubmitting ? "Anmelden..." : "Login"}
           </Button>
         </motion.div>
       </motion.div>
