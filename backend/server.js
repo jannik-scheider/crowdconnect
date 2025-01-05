@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
 const { Server } = require("socket.io");
-const { createAdapter } = require('@socket.io/redis-adapter');
-const { Redis } = require('ioredis');
+const { createAdapter } = require("@socket.io/redis-adapter");
+const { Redis } = require("ioredis");
 require("dotenv").config();
 
 // import { ChatRoom } from "./utils/rooms";
@@ -23,11 +23,10 @@ const {
   fetchChatRooms,
 } = require("./utils/chat-rooms/chat-rooms");
 
-
-
 const pubClient = new Redis({
-  host: process.env.REDIS_ENDPOINT, port: 6379
- });
+  host: process.env.REDIS_ENDPOINT,
+  port: 6379,
+});
 const subClient = pubClient.duplicate();
 
 pubClient.on("error", (err) => {
@@ -47,7 +46,6 @@ const io = new Server(http, {
 });
 
 io.adapter(createAdapter(pubClient, subClient));
-
 
 io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
