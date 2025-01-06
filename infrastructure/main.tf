@@ -195,6 +195,7 @@ resource "aws_ecs_cluster" "live_chat_cluster" {
   }
 }
 
+
 # 6. Task-Definition
 resource "aws_ecs_task_definition" "live_chat_task" {
   family                   = "live-chat-task"
@@ -202,7 +203,9 @@ resource "aws_ecs_task_definition" "live_chat_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
+
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.live_chat_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -232,6 +235,7 @@ resource "aws_ecs_task_definition" "live_chat_task" {
     }
   ])
 }
+
 
 # 7. Load Balancer
 resource "aws_lb" "live_chat_alb" {
@@ -510,4 +514,83 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   tags = {
     Name = "live-chat-redis"
   }
+}
+
+
+
+
+##### dynamodb
+
+resource "aws_dynamodb_table" "users" {
+  name         = "Users2"
+  billing_mode = "PAY_PER_REQUEST"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  hash_key = "id"
+
+  table_class = "STANDARD"
+}
+
+
+resource "aws_dynamodb_table" "chatrooms" {
+  name         = "ChatRooms2"
+  billing_mode = "PAY_PER_REQUEST"
+
+
+  attribute {
+    name = "name"
+    type = "S"
+  }
+
+  hash_key = "name"
+
+  table_class = "STANDARD"
+}
+
+
+data "aws_iam_policy_document" "live_chat_task_role_assume_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "live_chat_task_role" {
+  name_prefix        = "live-chat-task-role-"
+  assume_role_policy = data.aws_iam_policy_document.live_chat_task_role_assume_policy.json
+  description        = "IAM Role for ECS tasks to access DynamoDB"
+}
+
+
+data "aws_iam_policy_document" "live_chat_task_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:*"
+    ]
+    resources = [
+      aws_dynamodb_table.users.arn,
+      aws_dynamodb_table.chatrooms.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "live_chat_task_policy" {
+  name        = "live-chat-task-policy"
+  description = "Policy for ECS tasks to access DynamoDB tables"
+  policy      = data.aws_iam_policy_document.live_chat_task_policy.json
+}
+
+
+resource "aws_iam_role_policy_attachment" "live_chat_task_attachment" {
+  role       = aws_iam_role.live_chat_task_role.name
+  policy_arn = aws_iam_policy.live_chat_task_policy.arn
 }
