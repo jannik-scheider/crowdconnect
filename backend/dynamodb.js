@@ -4,8 +4,8 @@ require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 // Configuration
 AWS.config.update({
   region: "eu-central-1",
-  accessKeyId: "AKIAXTORPSM2BDFWBXON",
-  secretAccessKey: "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",
+  accessKeyId: "AKIAXTORPSM2M7LTQAVL",
+  secretAccessKey: "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",
 });
 
 // Create DynamoDB instance

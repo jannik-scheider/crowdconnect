@@ -33,6 +33,14 @@ const ChatRoomPage: React.FC = () => {
       navigate("/");
     }
 
+    window.addEventListener("popstate", leaveChatRoom);
+
+    return () => {
+      window.removeEventListener("popstate", leaveChatRoom);
+    };
+  }, []);
+
+  useEffect(() => {
     function onChatMessageEvent(message: Message) {
       setMessages((prev) => [
         ...prev,
@@ -67,9 +75,9 @@ const ChatRoomPage: React.FC = () => {
       socket.off("userJoined", onUserJoinedEvent);
       socket.off("userLeft", onUserLeftEvent);
 
-      //   socket.disconnect();
+      // socket.disconnect();
     };
-  }, []);
+  }, [navigate, socket, roomName, username]);
 
   useEffect(() => {
     // Automatisches Scrollen nach unten
@@ -93,10 +101,9 @@ const ChatRoomPage: React.FC = () => {
         alert(error);
         return navigate("/");
       }
-      console.log("test");
-      // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
-      navigate("/chat-rooms", { state: { username } });
     });
+    // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
+    navigate("/chat-rooms", { state: { username } });
   };
 
   const signOut = () => {

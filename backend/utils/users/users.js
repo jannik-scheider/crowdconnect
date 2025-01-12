@@ -38,14 +38,14 @@ const createUser = async ({ id: userId, username }) => {
 
   // Check for existing user
   try {
-    validateUserNotExists(userId);
+    await validateUserNotExists(userId);
   } catch (error) {
     throw new Error("Creating user failed:", { cause: error });
   }
 
   // Check for existing username
   try {
-    validateUsernameNotExists(username);
+    await validateUsernameNotExists(username);
   } catch (error) {
     throw new Error("Creating user failed:", { cause: error });
   }
@@ -55,8 +55,14 @@ const createUser = async ({ id: userId, username }) => {
   return addItem(TABLE_NAME, user);
 };
 
-const deleteUser = (userId) => {
-  return removeItem(TABLE_NAME, { id: userId });
+const deleteUser = async (userId) => {
+  const deletedUser = await removeItem(TABLE_NAME, { id: userId });
+
+  if (!deletedUser) {
+    throw new Error(
+      `Could not delete user because the user with the user ID '${userId}' was not found.`
+    );
+  }
 };
 
 const assignRoomToUser = async (userId, roomName) => {
@@ -71,7 +77,7 @@ const assignRoomToUser = async (userId, roomName) => {
   roomName = roomName.trim().toLowerCase();
 
   // Check for existing chat room
-  validateChatRoomExists(roomName);
+  await validateChatRoomExists(roomName);
 
   const user = await setItemAttribute(
     TABLE_NAME,

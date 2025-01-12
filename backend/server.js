@@ -1,3 +1,5 @@
+// TODO: Aufruf von _getChatRoomsInfo() prüfen (Fehlerbehandlung...)
+
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
@@ -21,11 +23,21 @@ const {
   createChatRoom,
   deleteChatRoom,
   fetchChatRooms,
+  fetchChatRoomByName,
+  deleteChatRoomsWithOwner,
 } = require("./utils/chat-rooms/chat-rooms");
 
 const pubClient = new Redis({
-  host: process.env.REDIS_ENDPOINT,
-  port: 6379,
+  host: "redis-12501.c55.eu-central-1-1.ec2.redns.redis-cloud.com",
+  port: 12501,
+  // User: "default",
+  password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
+  maxRetriesPerRequest: 100,
+  // connectTimeout: 10000,
+  // commandTimeout: 5000,
+
+  // host: process.env.REDIS_ENDPOINT,
+  // port: 6379,
 });
 const subClient = pubClient.duplicate();
 
@@ -57,6 +69,7 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error("Creating user failed:", error.cause || error);
 
+      // TODO: Benutzer-Fehlermeldung erzeugen und ausgeben
       return callback(
         error.userErrorMessage ||
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
@@ -100,6 +113,24 @@ io.on("connection", (socket) => {
   });
 
   socket.on("deleteChatRoom", async (roomName, callback) => {
+    let room = null;
+    try {
+      room = await fetchChatRoomByName(roomName);
+    } catch (error) {
+      `Could not delete the chat room '${roomName}' because an error occured while tryig to fetch the chat room with the name '${roomName}' from the database:`,
+        { cause: error };
+      return callback(
+        "Der Chatroom konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
+      );
+    }
+
+    // Check if the user is the owner and therefore allowed to delete the chat room
+    if (socket.id !== room.ownerId) {
+      return callback(
+        "Der Chatroom konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
+      );
+    }
+
     try {
       await deleteChatRoom(roomName);
     } catch (error) {
@@ -109,7 +140,7 @@ io.on("connection", (socket) => {
       );
     }
 
-    const updatedChatRooms = _getChatRoomsInfo();
+    const updatedChatRooms = await _getChatRoomsInfo();
     io.emit("updatedChatRooms", updatedChatRooms);
 
     callback();
@@ -133,12 +164,10 @@ io.on("connection", (socket) => {
 
     socket.join(user.roomName);
 
-    console.log(`${user.username} has joined the chat room ${roomName}.`);
-
     socket.emit("message", `Welcome to the chat room '${roomName}'!`);
     socket.broadcast.to(user.roomName).emit("userJoined", user.username);
 
-    const updatedChatRooms = _getChatRoomsInfo();
+    const updatedChatRooms = await _getChatRoomsInfo();
     socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
 
     callback();
@@ -157,8 +186,6 @@ io.on("connection", (socket) => {
     }
 
     socket.leave(user.roomName);
-
-    console.log(`${user.username} has left the chat room '${roomName}'.`);
     socket.broadcast.to(roomName).emit("userLeft", user.username);
 
     _getChatRoomsInfo()
@@ -197,23 +224,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", async () => {
-    console.log(`websocket connection disconnected: ${socket.id}`);
+    console.log(`WebSocket connection disconnected: ${socket.id}`);
 
     let deletedUser = null;
     try {
       deletedUser = await deleteUser(socket.id);
+      await deleteChatRoomsWithOwner(socket.id);
     } catch (error) {
-      return console.error(
-        `Deleting disconnecting user with ID '${userId}' failed:`,
+      console.error(
+        `Deleting disconnecting user with ID '${socket.id}' failed:`,
         error
       );
     }
 
-    if (!deletedUser) {
-      console.error(
-        `Could not delete user because the user with the Socket ID '${socket.id}' was not found.`
-      );
-    }
+    const updatedChatRooms = await _getChatRoomsInfo();
+    io.emit("updatedChatRooms", updatedChatRooms);
   });
 });
 

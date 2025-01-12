@@ -5,11 +5,11 @@
 
 const {
   fetchItem,
+  fetchItemsByAttributeValue,
   fetchAllItems,
   addItem,
   removeItem,
 } = require("../../dynamodb.js");
-// const { validateUserExists } = require("../users/validations.js");
 
 const TABLE_NAME = "ChatRooms";
 
@@ -22,8 +22,6 @@ const createChatRoom = async ({ name: roomName, ownerId }) => {
       cause: "Cannot create chat room because the given owner ID is empty.",
     };
   }
-
-  // validateUserExists(ownerId);
 
   // Clean chat room name
   roomName = roomName.trim().toLowerCase();
@@ -75,6 +73,29 @@ const fetchChatRoomByName = (roomName) => {
   });
 };
 
+const deleteChatRoomsWithOwner = async (ownerId) => {
+  let chatRooms = [];
+  try {
+    chatRooms = await fetchItemsByAttributeValue(
+      TABLE_NAME,
+      "ownerId",
+      ownerId
+    );
+  } catch (error) {
+    console.error(
+      `Deleting chat rooms with owner with ID '${ownerId}' failed:`,
+      error
+    );
+    throw error;
+  }
+
+  const deletePromises = chatRooms.map(({ name: roomName }) => {
+    deleteChatRoom(roomName);
+  });
+
+  await Promise.all(deletePromises);
+};
+
 const fetchChatRooms = () => {
   return fetchAllItems(TABLE_NAME).catch((error) => {
     console.error("Fetching chat rooms failed:", error);
@@ -86,5 +107,6 @@ module.exports = {
   createChatRoom,
   deleteChatRoom,
   fetchChatRoomByName,
+  deleteChatRoomsWithOwner,
   fetchChatRooms,
 };

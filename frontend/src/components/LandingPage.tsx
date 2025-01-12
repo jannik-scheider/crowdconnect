@@ -37,12 +37,10 @@ const LandingPage: React.FC = () => {
     }
 
     socket.emit("getChatRoomsInfo", (roomsInfo: ChatRoomInfo[]) => {
-      console.log(roomsInfo);
       setChatRooms(roomsInfo);
     });
 
     function onUpdatedChatRoomsEvent(roomInfos: ChatRoomInfo[]) {
-      console.log("updated rooms", roomInfos);
       setChatRooms(roomInfos);
     }
 

@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
     socket.connect();
 
     socket.on("connect", () => {
-      console.log("Connected with ID:", socket.id);
+      console.log("Connected with Socket ID:", socket.id);
     });
 
     // return () => {
@@ -118,7 +118,7 @@ const LoginPage: React.FC = () => {
               disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70
             "
           >
-            {isSubmitting ? "Anmelden..." : "Login"}
+            {isSubmitting ? "Beitreten..." : "Beitreten"}
           </Button>
         </motion.div>
       </motion.div>

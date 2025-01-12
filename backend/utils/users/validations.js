@@ -39,8 +39,7 @@ const validateUserExists = async (userId) => {
   let existingUser = null;
 
   try {
-    existingUser = await fetchItem(TABLE_NAME, { id: userId });
-    // TODO
+    // TODO: Mit Umsetzung eines Redis-Konzepts auskommentieren
     // existingUser = await fetchUserById(userId);
   } catch (error) {
     throw new UserValidationError(
@@ -60,8 +59,7 @@ const validateUserNotExists = async (userId) => {
   let existingUser = null;
 
   try {
-    existingUser = await fetchItem(TABLE_NAME, { id: userId });
-    // TODO
+    // TODO: Mit Umsetzung eines Redis-Konzepts auskommentieren
     // existingUser = await fetchUserById(userId);
   } catch (error) {
     throw new UserValidationError(
@@ -71,7 +69,6 @@ const validateUserNotExists = async (userId) => {
   }
 
   if (existingUser) {
-    console.log("ex user", existingUser);
     throw new UserValidationError(
       `A user with the ID '${userId}' does already exist.`
     );
