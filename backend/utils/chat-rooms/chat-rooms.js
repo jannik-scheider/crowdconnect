@@ -11,6 +11,11 @@ const {
   removeItem,
 } = require("../../dynamodb.js");
 
+const EventEmitter = require("events");
+
+class MyEmitter extends EventEmitter {}
+const chatRoomsEmitter = new MyEmitter();
+
 const TABLE_NAME = "ChatRooms";
 
 const createChatRoom = async ({ name: roomName, ownerId }) => {
@@ -60,12 +65,14 @@ const createChatRoom = async ({ name: roomName, ownerId }) => {
 };
 
 const deleteChatRoom = (roomName) => {
-  console.log("deleteChatRoom roomName: ", roomName)
-  const name = roomName
-  return removeItem(TABLE_NAME, { name }).catch((error) => {
-    console.error(`Deleting chat room '${roomName}' failed:`, error);
-    throw error;
-  });
+  return removeItem(TABLE_NAME, { name: roomName })
+    .then(({ name }) => {
+      chatRoomsEmitter.emit("deletedRoom", name);
+    })
+    .catch((error) => {
+      console.error(`Deleting chat room '${roomName}' failed:`, error);
+      throw error;
+    });
 };
 
 const fetchChatRoomByName = (roomName) => {
@@ -77,6 +84,7 @@ const fetchChatRoomByName = (roomName) => {
 
 const deleteChatRoomsWithOwner = async (ownerId) => {
   let chatRooms = [];
+
   try {
     chatRooms = await fetchItemsByAttributeValue(
       TABLE_NAME,
@@ -106,6 +114,7 @@ const fetchChatRooms = () => {
 };
 
 module.exports = {
+  chatRoomsEmitter,
   createChatRoom,
   deleteChatRoom,
   fetchChatRoomByName,

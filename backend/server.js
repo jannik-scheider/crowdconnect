@@ -1,5 +1,3 @@
-// TODO: Aufruf von _getChatRoomsInfo() prüfen (Fehlerbehandlung...)
-
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
@@ -7,7 +5,7 @@ const { Server } = require("socket.io");
 const { createAdapter } = require("@socket.io/redis-adapter");
 const { Redis } = require("ioredis");
 require("dotenv").config();
-const os = require('os');
+const os = require("os");
 
 // import { ChatRoom } from "./utils/rooms";
 
@@ -21,6 +19,7 @@ const {
 } = require("./utils/users/users");
 
 const {
+  chatRoomsEmitter,
   createChatRoom,
   deleteChatRoom,
   fetchChatRooms,
@@ -85,7 +84,9 @@ io.on("connection", (socket) => {
       })
       .catch((error) => {
         console.error("Getting chat rooms info failed:", error);
-        return callback(error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
       });
   });
 
@@ -108,8 +109,10 @@ io.on("connection", (socket) => {
         return callback();
       })
       .catch((error) => {
-        console.error("Getting chat rooms info failed:", error);
-        return callback(error);
+        console.error(`Creating chatroom '${roomName}' failed:`, error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
       });
   });
 
@@ -141,10 +144,17 @@ io.on("connection", (socket) => {
       );
     }
 
-    const updatedChatRooms = await _getChatRoomsInfo();
-    io.emit("updatedChatRooms", updatedChatRooms);
-
-    callback();
+    _getChatRoomsInfo()
+      .then((roomsInfo) => {
+        io.emit("updatedChatRooms", roomsInfo);
+        return callback();
+      })
+      .catch((error) => {
+        console.error(`Deleting chatroom '${roomName}' failed:`, error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
+      });
   });
 
   socket.on("joinChatRoom", async (roomName, callback) => {
@@ -168,10 +178,17 @@ io.on("connection", (socket) => {
     socket.emit("message", `Welcome to the chat room '${roomName}'!`);
     socket.broadcast.to(user.roomName).emit("userJoined", user.username);
 
-    const updatedChatRooms = await _getChatRoomsInfo();
-    socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
-
-    callback();
+    _getChatRoomsInfo()
+      .then((roomsInfo) => {
+        io.emit("updatedChatRooms", roomsInfo);
+        return callback();
+      })
+      .catch((error) => {
+        console.error(`Joining chatroom '${roomName}' failed:`, error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
+      });
   });
 
   socket.on("leaveChatRoom", async (roomName, callback) => {
@@ -191,12 +208,14 @@ io.on("connection", (socket) => {
 
     _getChatRoomsInfo()
       .then((roomsInfo) => {
-        socket.broadcast.emit("updatedChatRooms", roomsInfo);
+        io.emit("updatedChatRooms", roomsInfo);
         return callback();
       })
       .catch((error) => {
-        console.error("Getting chat rooms info failed:", error);
-        return callback(error);
+        console.error(`Leaving chatroom '${roomName}' failed:`, error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
       });
   });
 
@@ -219,7 +238,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    message = message + hostname
+    message = message + hostname;
     io.to(user.roomName).emit("chatMessage", {
       username: user.username,
       message,
@@ -229,9 +248,8 @@ io.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     console.log(`WebSocket connection disconnected: ${socket.id}`);
 
-    let deletedUser = null;
     try {
-      deletedUser = await deleteUser(socket.id);
+      await deleteUser(socket.id);
       await deleteChatRoomsWithOwner(socket.id);
     } catch (error) {
       console.error(
@@ -240,9 +258,14 @@ io.on("connection", (socket) => {
       );
     }
 
+    // TODO: Keine try...catch-Fehlerbehandlung?
     const updatedChatRooms = await _getChatRoomsInfo();
-    io.emit("updatedChatRooms", updatedChatRooms);
+    socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
   });
+});
+
+chatRoomsEmitter.on("deletedRoom", (roomName) => {
+  io.to(roomName).emit("chatRoomDeleted");
 });
 
 async function _getChatRoomsInfo() {
@@ -262,7 +285,10 @@ async function _getChatRoomsInfo() {
         const users = await fetchUsersInRoom(room.name);
         return { userCount: users.length, ...room };
       } catch (error) {
-        console.error(`Fetching users in room '${room.name}' failed:`, error);
+        console.error(
+          `An error occured while trying to get the chat rooms info: Fetching users in room '${room.name}' failed:`,
+          error
+        );
         return { userCount: null, ...room };
       }
     })
@@ -271,13 +297,13 @@ async function _getChatRoomsInfo() {
   return chatRoomsInfo;
 }
 
-app.get('/health', (req, res) => {
-  const redisStatus = pubClient.status === 'ready';
+app.get("/health", (req, res) => {
+  const redisStatus = pubClient.status === "ready";
   if (!redisStatus) {
-      return res.status(500).send('Redis is not ready');
+    return res.status(500).send("Redis is not ready");
   }
 
-  res.status(200).send('OK');
+  res.status(200).send("OK");
 });
 
 // Start server

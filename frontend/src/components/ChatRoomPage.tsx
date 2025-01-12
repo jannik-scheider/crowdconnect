@@ -62,18 +62,34 @@ const ChatRoomPage: React.FC = () => {
       ]);
     }
 
-    // Listener registrieren
+    function onChatRoomDeletedEvent() {
+      setMessages((prev) => [
+        ...prev,
+        {
+          username: "System",
+          message:
+            "Dieser Chatroom wurde gelöscht und wird in 5 Sekunden geschlossen.",
+        },
+      ]);
+
+      setTimeout(() => navigate("/chat-rooms", { state: { username } }), 5_000);
+    }
+
+    // Listeners registrieren
     socket.on("chatMessage", onChatMessageEvent);
 
     socket.on("userJoined", onUserJoinedEvent);
 
     socket.on("userLeft", onUserLeftEvent);
 
+    socket.on("chatRoomDeleted", onChatRoomDeletedEvent);
+
     // Cleanup beim Verlassen der Komponente
     return () => {
       socket.off("chatMessage", onChatMessageEvent);
       socket.off("userJoined", onUserJoinedEvent);
       socket.off("userLeft", onUserLeftEvent);
+      socket.off("chatRoomDeleted", onChatRoomDeletedEvent);
 
       // socket.disconnect();
     };
@@ -179,7 +195,7 @@ const ChatRoomPage: React.FC = () => {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-xl font-semibold text-white drop-shadow">
-            Chat Room "{roomName}"
+            Chatroom "{roomName}"
           </h2>
           <div className="flex items-center space-x-4">
             <span className="text-white/80 text-sm italic">
