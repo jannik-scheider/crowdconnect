@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 const { createAdapter } = require("@socket.io/redis-adapter");
 const { Redis } = require("ioredis");
 require("dotenv").config();
+const os = require('os');
 
 // import { ChatRoom } from "./utils/rooms";
 
@@ -202,6 +203,7 @@ io.on("connection", (socket) => {
   socket.on("chatMessage", async (message) => {
     let user = null;
     let error = null;
+    const hostname = os.hostname();
 
     try {
       user = await fetchUserById(socket.id);
@@ -217,6 +219,7 @@ io.on("connection", (socket) => {
       return;
     }
 
+    message = message + hostname
     io.to(user.roomName).emit("chatMessage", {
       username: user.username,
       message,
@@ -267,6 +270,15 @@ async function _getChatRoomsInfo() {
 
   return chatRoomsInfo;
 }
+
+app.get('/health', (req, res) => {
+  const redisStatus = pubClient.status === 'ready';
+  if (!redisStatus) {
+      return res.status(500).send('Redis is not ready');
+  }
+
+  res.status(200).send('OK');
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;
