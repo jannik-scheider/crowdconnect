@@ -150,7 +150,7 @@ io.on("connection", (socket) => {
     }
 
     console.log(`message from ${user.username}: ${message}`);
-    message = message + " hello" + hostname
+    message = message + hostname
     io.to(user.roomName).emit("chatMessage", {
       username: user.username,
       message,
