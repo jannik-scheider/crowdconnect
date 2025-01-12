@@ -60,7 +60,9 @@ const createChatRoom = async ({ name: roomName, ownerId }) => {
 };
 
 const deleteChatRoom = (roomName) => {
-  return removeItem(TABLE_NAME, { roomName }).catch((error) => {
+  console.log("deleteChatRoom roomName: ", roomName)
+  const name = roomName
+  return removeItem(TABLE_NAME, { name }).catch((error) => {
     console.error(`Deleting chat room '${roomName}' failed:`, error);
     throw error;
   });
