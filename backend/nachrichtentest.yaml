@@ -1,23 +1,22 @@
 config:
-  target: "http://localhost:3000"
+  target: "https://api.crowdconnect.fun"
   phases:
     - duration: 60
-      arrivalRate: 5
-      rampTo: 10
-      name: Warm up the API
-    - duration: 60
       arrivalRate: 10
-      rampTo: 50
-      name: Ramp up to peak load
+      name: "Phase 1 - Stabile Last"
+    - duration: 60
+      arrivalRate: 30
+      name: "Phase 2 - Erhöhte Last"
     - duration: 60
       arrivalRate: 50
-      name: Sustained peak load
+      name: "Phase 3 - Hohe Last"  
   engines:
    socketio-v3: {}
   processor: "./custom.js" # set a custom processor to load dynamic scenario data
 
+
 scenarios:
-  - name: "Full Chat-Szenario"
+  - name: "Connections Test"
     engine: socketio-v3
     flow:
       - function: "getChatData" # load variables
@@ -27,7 +26,7 @@ scenarios:
         acknowledge: true
       - emit:
           channel: "joinChatRoom"
-          data: "testroom"
+          data: "loadtest"
         acknowledge: true
       - emit:
           channel: "chatMessage"
@@ -38,7 +37,7 @@ scenarios:
           data: "{{ goodbye }}"
       - emit:
           channel: "leaveChatRoom"
-          data: "testroom"
+          data: "loadtest"
         acknowledge: true
 
       - think: 5

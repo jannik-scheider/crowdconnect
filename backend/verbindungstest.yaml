@@ -1,0 +1,27 @@
+config:
+  target: "https://api.crowdconnect.fun"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Phase 1 - Stabile Last"
+    - duration: 60
+      arrivalRate: 10
+      name: "Phase 2 - Erhöhte Last"
+    - duration: 60
+      arrivalRate: 15
+      name: "Phase 3 - Hohe Last"  
+  engines:
+   socketio-v3: {}
+  processor: "./custom.js" # set a custom processor to load dynamic scenario data
+
+
+scenarios:
+  - name: "Connections Test"
+    engine: socketio-v3
+    flow:
+      - function: "getChatData" # load variables
+      - emit:
+          channel: "createUser"
+          data: "{{ name }}"
+        acknowledge: true
+      - think: 5

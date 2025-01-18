@@ -1,13 +1,14 @@
 {
     "yaml.schemas": {
         "https://www.artillery.io/schema.json": [
-            "file:///c%3A/Users/janni/git/live-chat/loadtest.yml",
             "file:///c%3A/Users/janni/git/live-chat/loadtest4o.yml",
             "file:///c%3A/Users/janni/git/live-chat/loadtest4o1.yml",
             "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o.yml",
             "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o1.yml",
-            "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o1.yaml",
-            "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o.yaml"
+            "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/backend/nachrichtentest.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/backend/verbindungstest.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/backend/breaking-point.yaml"
         ]
     }
 }

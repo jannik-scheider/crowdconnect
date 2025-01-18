@@ -183,6 +183,10 @@ resource "aws_security_group" "live_chat_service_sg" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "live_chat_logs" {
+  name              = "/ecs/live-chat-task"
+  retention_in_days = 7 # oder gewünschter Aufbewahrungszeitraum
+}
 
 
 # 5. ECS Cluster
@@ -223,7 +227,6 @@ resource "aws_ecs_task_definition" "live_chat_task" {
       ],
       environment = [
         {
-          # z.B. Output aus "redis_endpoint" => "redis://<ENDPOINT>:6379"
           name  = "REDIS_ENDPOINT"
           value = "${aws_elasticache_cluster.redis_cluster.cache_nodes[0].address}"
         },
@@ -231,9 +234,114 @@ resource "aws_ecs_task_definition" "live_chat_task" {
           name  = "FRONTEND_URL"
           value = "https://crowdconnect.fun"
         }
+      ],
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          # CloudWatch Log Group
+          "awslogs-group" = "${aws_cloudwatch_log_group.live_chat_logs.name}"
+          # Region deiner Infrastruktur
+          "awslogs-region" = "eu-central-1"
+          # Wird später zur Unterscheidung der Container-Streams benutzt
+          "awslogs-stream-prefix" = "live-chat"
+        }
+      }
+    },
+    {
+      name      = "cwagent",
+      image     = "public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest",
+      cpu       = 0,
+      memory    = 128,
+      essential = false, // "false", damit der Agent-Container optional ist und dein Hauptcontainer weiterlaufen kann
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "${aws_cloudwatch_log_group.live_chat_logs.name}"
+          "awslogs-region"        = "eu-central-1"
+          "awslogs-stream-prefix" = "cwagent"
+        }
+      },
+      // Variante A: Konfiguration als Env-Variable
+      environment = [
+        {
+          name  = "CW_CONFIG_CONTENT" // Name beliebig
+          value = <<EOF
+{
+  "agent": {
+    "metrics_collection_interval": 1,
+    "run_as_user": "root"
+  },
+  "metrics": {
+    "namespace": "LiveChatCustom",
+    "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          { "name": "usage_active", "rename": "CPUUtilization", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 1
+      },
+      "mem": {
+        "measurement": [
+          { "name": "mem_used_percent", "rename": "MemoryUtilization", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 1
+      },
+      "net": {
+        "measurement": [
+          { "name": "bytes_recv", "unit": "Bytes" },
+          { "name": "bytes_sent", "unit": "Bytes" }
+        ],
+        "metrics_collection_interval": 1
+      }
+    }
+  }
+}
+EOF
+        }
+      ],
+      // Startbefehl: übergebe die Env-Variable als Konfigfile
+      entryPoint = [
+        "/opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent"
+      ],
+      command = [
+        "-config", "/tmp/cwagent-config.json", // Pfad, unter dem die Datei gespeichert werden soll
+        "-configmap", "CW_CONFIG_CONTENT",     // Sagt dem Agent, er soll den Inhalt aus Env verwenden
+        "-env"
       ]
     }
   ])
+}
+
+
+
+
+
+
+
+
+
+
+data "aws_iam_policy_document" "cloudwatch_agent_policy_doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "cloudwatch_agent_policy" {
+  name   = "CloudWatchAgentPolicy"
+  policy = data.aws_iam_policy_document.cloudwatch_agent_policy_doc.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_cloudwatch_agent_policy" {
+  role       = aws_iam_role.live_chat_task_role.name
+  policy_arn = aws_iam_policy.cloudwatch_agent_policy.arn
 }
 
 
@@ -537,7 +645,7 @@ resource "aws_dynamodb_table" "users" {
 
 
 resource "aws_dynamodb_table" "chatrooms" {
-  name         = "ChatRooms2"
+  name         = "ChatRooms"
   billing_mode = "PAY_PER_REQUEST"
 
 
