@@ -1,7 +1,7 @@
 // export interface User {
 //   id: string;
 //   username: string;
-//   roomName?: string;
+//   channelName?: string;
 // }
 
 const {
@@ -13,7 +13,7 @@ const {
   removeItemAttribute,
 } = require("../../dynamodb.js");
 
-const { validateChatRoomExists } = require("../chat-rooms/validations.js");
+const { validateChannelExists } = require("../channels/validations.js");
 
 const {
   validateUserNotExists,
@@ -65,57 +65,59 @@ const deleteUser = async (userId) => {
   }
 };
 
-const assignRoomToUser = async (userId, roomName) => {
-  // Validate room name
-  if (!roomName) {
+const assignChannelToUser = async (userId, channelName) => {
+  // Validate channel name
+  if (!channelName) {
     throw new UserValidationError(
-      `Could not assign room to the user with the ID '${userId}' because the given room name is empty.`
+      `Could not assign channel to the user with the ID '${userId}' because the given channel name is empty.`
     );
   }
 
-  // Clean room name
-  roomName = roomName.trim().toLowerCase();
+  // Clean channel name
+  channelName = channelName.trim().toLowerCase();
 
-  // Check for existing chat room
-  await validateChatRoomExists(roomName);
+  // Check for existing channel
+  await validateChannelExists(channelName);
 
   const user = await setItemAttribute(
     TABLE_NAME,
     { id: userId },
-    "roomName",
-    roomName
+    // TODO: Heißt das Datenbankattribut nicht "name"?
+    "channelName",
+    channelName
   );
 
   return user;
 };
 
-const removeRoomFromUser = async (userId, roomName) => {
+const removeChannelFromUser = async (userId, channelName) => {
   // Validate the data
-  if (!userId || !roomName) {
+  if (!userId || !channelName) {
     throw {
       userMessage:
         "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut.",
-      cause: `Cannot remove room '${roomName}' from the user with the ID '${id}' because either the given user ID or room name is empty.`,
+      cause: `Cannot remove channel '${channelName}' from the user with the ID '${id}' because either the given user ID or channel name is empty.`,
     };
   }
 
-  // Clean room name
-  roomName = roomName.trim().toLowerCase();
+  // Clean channel name
+  channelName = channelName.trim().toLowerCase();
 
   let user = null;
   try {
-    user = await removeItemAttribute(TABLE_NAME, { id: userId }, "roomName");
+    // TODO: Heißt das Datenbankattribut nicht "name"?
+    user = await removeItemAttribute(TABLE_NAME, { id: userId }, "channelName");
   } catch (error) {
     // TODO: Überarbeiten
 
     console.error(
-      `Removing room '${roomName}' from user with ID '${userId}' failed:`,
+      `Removing channel '${channelName}' from user with ID '${userId}' failed:`,
       error
     );
     throw {
       userMessage:
         "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut.",
-      cause: `Could not remove room '${roomName}' from the user with the ID '${id}':`,
+      cause: `Could not remove channel '${channelName}' from the user with the ID '${id}':`,
       error,
     };
   }
@@ -136,20 +138,23 @@ const _fetchUsersByUsername = (username) => {
   );
 };
 
-const fetchUsersInRoom = (roomName) => {
-  return fetchItemsByAttributeValue(TABLE_NAME, "roomName", roomName).catch(
-    (error) => {
-      console.error(`Fetching users in room '${roomName}' failed: `, error);
-      throw error;
-    }
-  );
+const fetchUsersInChannel = (channelName) => {
+  // TODO: Heißt das Datenbankattribut nicht "name"?
+  return fetchItemsByAttributeValue(
+    TABLE_NAME,
+    "channelName",
+    channelName
+  ).catch((error) => {
+    console.error(`Fetching users in channel '${channelName}' failed: `, error);
+    throw error;
+  });
 };
 
 module.exports = {
   createUser,
   deleteUser,
-  assignRoomToUser,
-  removeRoomFromUser,
+  assignChannelToUser,
+  removeChannelFromUser,
   fetchUserById,
-  fetchUsersInRoom,
+  fetchUsersInChannel,
 };

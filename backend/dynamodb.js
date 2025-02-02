@@ -46,7 +46,10 @@ const fetchAllItems = (tableName) => {
 };
 
 const addItem = (tableName, item) => {
-  return dynamoDB.put({ TableName: tableName, Item: item }).promise();
+  return dynamoDB
+    .put({ TableName: tableName, Item: item })
+    .promise()
+    .then(() => item);
 };
 
 const removeItem = (tableName, key) => {

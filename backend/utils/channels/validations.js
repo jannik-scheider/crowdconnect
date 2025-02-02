@@ -1,4 +1,4 @@
-const { fetchChatRoomByName } = require("./chat-rooms.js");
+const { fetchChannelByName } = require("./channels.js");
 
 const TABLE_NAME = "Users";
 
@@ -24,23 +24,23 @@ class InputValidationError extends Error {
   }
 }
 
-const validateChatRoomExists = async (roomName) => {
-  let existingRoom = null;
+const validateChannelExists = async (channelName) => {
+  let existingChannel = null;
 
   try {
-    existingRoom = await fetchChatRoomByName(roomName);
+    existingChannel = await fetchChannelByName(channelName);
   } catch (error) {
     throw new UserValidationError(
-      `Could not validate that the chat room with the name '${roomName}' does not exist because an error occured while tryig to fetch the chat room with the name '${roomName}' from the database:`,
+      `Could not validate that the channel with the name '${channelName}' does not exist because an error occured while tryig to fetch the channel with the name '${channelName}' from the database:`,
       { cause: error }
     );
   }
 
-  if (!existingRoom) {
+  if (!existingChannel) {
     throw new UserValidationError(
-      `A chat room with the name '${roomName}' does not exist.`
+      `A channel with the name '${channelName}' does not exist.`
     );
   }
 };
 
-module.exports = { validateChatRoomExists };
+module.exports = { validateChannelExists };
