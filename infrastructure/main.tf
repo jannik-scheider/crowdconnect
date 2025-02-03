@@ -536,8 +536,8 @@ resource "aws_dynamodb_table" "users" {
 }
 
 
-resource "aws_dynamodb_table" "chatrooms" {
-  name         = "ChatRooms2"
+resource "aws_dynamodb_table" "channels" {
+  name         = "Channels2"
   billing_mode = "PAY_PER_REQUEST"
 
 
@@ -578,7 +578,7 @@ data "aws_iam_policy_document" "live_chat_task_policy" {
     ]
     resources = [
       aws_dynamodb_table.users.arn,
-      aws_dynamodb_table.chatrooms.arn
+      aws_dynamodb_table.channels.arn
     ]
   }
 }

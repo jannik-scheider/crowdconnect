@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   ArrowRightIcon,
+  ArrowRightStartOnRectangleIcon,
   ArrowLeftEndOnRectangleIcon,
   PlusIcon,
   TrashIcon,
@@ -12,21 +13,24 @@ import {
 import { getSocket } from "../socket";
 import { Button } from "./ui/button";
 
-interface ChatRoomInfo {
+interface ChannelInfo {
+  ownerName: string;
   userCount: number;
-  ownerId: string;
   name: string;
+  ownerId: string;
+  isLive: boolean;
 }
 
 const LandingPage: React.FC = () => {
-  // const rooms = getRooms();
+  // const channels = getChannels();
   const location = useLocation();
   const username = location.state?.username;
-  const [isCreateChatRoomDialogOpen, setIsCreateChatRoomDialogOpen] =
+  const [isCreateChannelDialogOpen, setIsCreateChannelDialogOpen] =
     useState(false);
-  const [chatRoomName, setChatRoomName] = useState("");
-  const [chatRooms, setChatRooms] = useState<ChatRoomInfo[]>([]);
-  const [createChatRoomErrorMessage, setCreateChatRoomErrorMessage] =
+  const [channelName, setChannelName] = useState("");
+  const [ownChannels, setOwnChannels] = useState<ChannelInfo[]>([]);
+  const [liveChannels, setLiveChannels] = useState<ChannelInfo[]>([]);
+  const [createChannelErrorMessage, setCreateChannelErrorMessage] =
     useState("");
   const socket = getSocket();
   const navigate = useNavigate();
@@ -36,54 +40,72 @@ const LandingPage: React.FC = () => {
       navigate("/");
     }
 
-    socket.emit("getChatRoomsInfo", (roomsInfo: ChatRoomInfo[]) => {
-      setChatRooms(roomsInfo);
+    socket.emit("getChannelsInfo", (channelsInfo: ChannelInfo[]) => {
+      const liveChannels = channelsInfo
+        .filter((channel) => channel.ownerId !== socket.id)
+        .filter(({ isLive }) => !!isLive);
+      setLiveChannels(liveChannels);
+
+      const ownChannels = channelsInfo.filter(
+        (channel) => channel.ownerId === socket.id
+      );
+      setOwnChannels(ownChannels);
     });
 
-    function onUpdatedChatRoomsEvent(roomInfos: ChatRoomInfo[]) {
-      setChatRooms(roomInfos);
+    function onUpdatedChannelsEvent(updatedChannels: ChannelInfo[]) {
+      const liveChannels = updatedChannels
+        .filter((channel) => channel.ownerId !== socket.id)
+        .filter(({ isLive }) => !!isLive);
+      setLiveChannels(liveChannels);
+
+      const ownChannels = updatedChannels.filter(
+        (channel) => channel.ownerId === socket.id
+      );
+      setOwnChannels(ownChannels);
     }
 
-    socket.on("updatedChatRooms", onUpdatedChatRoomsEvent);
+    socket.on("updatedChannels", onUpdatedChannelsEvent);
 
     // Cleanup beim Verlassen der Komponente
     return () => {
-      socket.off("updatedChatRooms", onUpdatedChatRoomsEvent);
+      socket.off("updatedChannels", onUpdatedChannelsEvent);
 
       //   socket.disconnect();
     };
   }, []);
 
-  const handleCreateChatRoom = () => {
-    if (chatRoomName.trim()) {
-      socket.emit("createChatRoom", chatRoomName, (errorMessage: string) => {
+  const handleCreateChannel = () => {
+    if (channelName.trim()) {
+      socket.emit("createChannel", channelName, (errorMessage: string) => {
         if (errorMessage) {
-          return setCreateChatRoomErrorMessage(errorMessage);
+          return setCreateChannelErrorMessage(errorMessage);
         }
-        resetCreateChatRoomDialog();
+        resetCreateChannelDialog();
       });
     }
   };
 
-  const resetCreateChatRoomDialog = () => {
-    setIsCreateChatRoomDialogOpen(false);
-    setCreateChatRoomErrorMessage("");
-    setChatRoomName("");
+  const resetCreateChannelDialog = () => {
+    setIsCreateChannelDialogOpen(false);
+    setCreateChannelErrorMessage("");
+    setChannelName("");
   };
 
-  const handleJoinChatRoom = (roomName: string) => {
-    socket.emit("joinChatRoom", roomName, (errorMessage: unknown) => {
+  const handleJoinChannel = (channelName: string, channelOwnerId: string) => {
+    socket.emit("joinChannel", channelName, (errorMessage: unknown) => {
       if (errorMessage) {
         alert(errorMessage);
         return navigate("/");
       }
-      // TODO: Wie bekomme ich alle Rooms inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
-      navigate("/chat-room", { state: { username, roomName } });
+      // TODO: Wie bekomme ich alle Channels inkl. Anzahl der Nutzer in LandingPage.tsx für die Übersicht?
+      navigate("/channel", {
+        state: { username, channelName, channelOwnerId },
+      });
     });
   };
 
-  const handleDeleteChatRoom = (roomName: string) => {
-    socket.emit("deleteChatRoom", roomName, (errorMessage: unknown) => {
+  const handleDeleteChannel = (channelName: string) => {
+    socket.emit("deleteChannel", channelName, (errorMessage: unknown) => {
       if (errorMessage) {
         alert(errorMessage);
       }
@@ -130,139 +152,250 @@ const LandingPage: React.FC = () => {
       </motion.div>
 
       <div className="flex justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-100">
-            Chatrooms ({chatRooms.length})
-          </h1>
-        </div>
-
-        <Button
-          className="
-            bg-purple-400 hover:bg-purple-500 text-white rounded-full shadow-md h-12 mb-4
-            hover:scale-105 transition-transform duration-300 text-sm
-          "
-          onClick={() => setIsCreateChatRoomDialogOpen(true)}
-        >
-          <PlusIcon strokeWidth={2.5} />
-          <span className="leading-none">Chatroom erstellen</span>
-        </Button>
-      </div>
-
-      {/* Dialog */}
-      {isCreateChatRoomDialogOpen && (
-        <div className="flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h2 className="text-lg font-bold mb-4">Chatroom Name</h2>
-
-            {createChatRoomErrorMessage && (
-              <div className="error-message bg-red-100 text-red-600 px-2 py-1.5 mb-3 w-full rounded leading-[1.35]">
-                {createChatRoomErrorMessage}
+        <div className="flex flex-col space-y-12">
+          {ownChannels.length > 0 && (
+            <div>
+              <div className="flex justify-between">
+                <div className="h-[64px]">
+                  <h1 className="text-3xl font-bold text-gray-100">
+                    Eigene Kanäle ({ownChannels.length})
+                  </h1>
+                </div>
               </div>
-            )}
 
-            <input
-              type="text"
-              value={chatRoomName}
-              onChange={(e) => setChatRoomName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleCreateChatRoom();
-                }
-              }}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300 mb-4"
-              placeholder="Gib den Namen deines Chatrooms ein"
-              required
-            />
-            <div className="flex justify-end space-x-2 mt-2">
-              {/* Abbrechen Button */}
-              <button
-                onClick={resetCreateChatRoomDialog}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Abbrechen
-              </button>
-
-              {/* Bestätigen Button */}
-              <button
-                onClick={handleCreateChatRoom}
-                disabled={!!createChatRoomErrorMessage}
-                className="
-                  px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600
-                  disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70
-                "
-              >
-                Bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Container */}
-      <div className="flex">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-wrap gap-4"
-        >
-          {chatRooms.map((room, index) => (
-            <motion.div
-              key={index}
-              className="
+              {/* Container für eigene Kanäle */}
+              <div className="flex">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="flex flex-wrap gap-4"
+                >
+                  {ownChannels.map((channel, index) => (
+                    <motion.div
+                      key={index}
+                      className="
                 flex flex-col justify-between
-                rounded w-72 h-48 p-4
+                rounded w-72 h-44 p-4 pr-5 pb-5
                 bg-white/20 backdrop-blur-md rounded-xl shadow-lg
                 cursor-default  
                 "
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h2
-                title={room.name}
-                className="text-xl font-semibold text-white drop-shadow truncate"
-              >
-                {room.name}
-              </h2>
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="w-3/4">
+                          <span
+                            className="block text-xl font-semibold text-white drop-shadow truncate leading-8"
+                            title={channel.name}
+                          >
+                            {channel.name}
+                          </span>
 
-              {room.userCount !== null && (
-                <p className="text-gray-100 text-lg mb-5">
-                  {room.userCount} Benutzer
-                </p>
-              )}
+                          <span
+                            className="block text-lg font-medium text-white drop-shadow truncate"
+                            title="Owner"
+                          >
+                            {channel.ownerName}
+                          </span>
+                        </div>
+                      </div>
 
-              <div className="flex gap-x-2">
-                <Button
-                  className="
+                      <div className="flex gap-x-2">
+                        <Button
+                          className="
                     bg-purple-400 hover:bg-purple-500 text-white
                     px-4 py-1 rounded-full shadow-md 
                     hover:scale-105 transition-transform duration-300 text-sm
                 "
-                  onClick={() => handleJoinChatRoom(room.name)}
-                >
-                  <ArrowRightIcon strokeWidth={2.5} />
-                  <span className="leading-none">Beitreten</span>
-                </Button>
+                          title="Starte Livestream"
+                          onClick={() =>
+                            handleJoinChannel(channel.name, channel.ownerId)
+                          }
+                        >
+                          <ArrowRightStartOnRectangleIcon strokeWidth={2.5} />
+                          <span className="leading-none">Starten</span>
+                        </Button>
 
-                {room.ownerId === socket.id && (
-                  <Button
+                        {channel.ownerId === socket.id && (
+                          <Button
+                            className="
+                          bg-purple-400 hover:bg-purple-500 text-white
+                          px-4 py-1 rounded-full shadow-md 
+                          hover:scale-105 transition-transform duration-300 text-sm
+                        "
+                            onClick={() => handleDeleteChannel(channel.name)}
+                          >
+                            <TrashIcon strokeWidth={2.5} />
+                            <span className="leading-none">Löschen</span>
+                          </Button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                  {/* Channel as card */}
+                </motion.div>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="h-[64px]">
+              <h1 className="text-3xl font-bold text-gray-100 mb-4">
+                Live-Kanäle ({liveChannels.length})
+              </h1>
+            </div>
+
+            {/* Container für Live-Kanäle */}
+            <div className="flex">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex flex-wrap gap-4"
+              >
+                {liveChannels.map((channel, index) => (
+                  <motion.div
+                    key={index}
                     className="
+                      flex flex-col justify-between
+                      rounded w-72 h-44 p-4 pr-5 pb-5
+                      bg-white/20 backdrop-blur-md rounded-xl shadow-lg
+                      cursor-default  
+                  "
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="flex items-start justify-between space-x-4">
+                      <div className="w-2/3">
+                        <span
+                          className="block text-xl font-semibold text-white drop-shadow truncate leading-8"
+                          title={channel.name}
+                        >
+                          {channel.name}
+                        </span>
+
+                        <span
+                          className="block text-lg font-medium text-white drop-shadow truncate"
+                          title="Owner"
+                        >
+                          {channel.ownerName}
+                        </span>
+                      </div>
+
+                      {channel.userCount !== null && (
+                        <div
+                          className="flex items-center overflow-hidden"
+                          title={`${channel.userCount} Zuschauer`}
+                        >
+                          <div className="min-w-3.5 min-h-3.5 bg-red-500 rounded-full border border-white mt-[2px]"></div>
+                          <p className="ml-2 text-white truncate">
+                            {channel.userCount}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-x-2">
+                      <Button
+                        className="
+                    bg-purple-400 hover:bg-purple-500 text-white
+                    px-4 py-1 rounded-full shadow-md 
+                    hover:scale-105 transition-transform duration-300 text-sm
+                "
+                        title="Trete Livestream bei"
+                        onClick={() =>
+                          handleJoinChannel(channel.name, channel.ownerId)
+                        }
+                      >
+                        <ArrowRightIcon strokeWidth={2.5} />
+                        <span className="leading-none">Beitreten</span>
+                      </Button>
+
+                      {channel.ownerId === socket.id && (
+                        <Button
+                          className="
                   bg-purple-400 hover:bg-purple-500 text-white
                   px-4 py-1 rounded-full shadow-md 
                   hover:scale-105 transition-transform duration-300 text-sm
               "
-                    onClick={() => handleDeleteChatRoom(room.name)}
-                  >
-                    <TrashIcon strokeWidth={2.5} />
-                    <span className="leading-none">Löschen</span>
-                  </Button>
-                )}
+                          onClick={() => handleDeleteChannel(channel.name)}
+                        >
+                          <TrashIcon strokeWidth={2.5} />
+                          <span className="leading-none">Löschen</span>
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+                {/* Channel as card */}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        <Button
+          className="
+                bg-purple-400 hover:bg-purple-500 text-white rounded-full shadow-md h-12 mb-4
+                hover:scale-105 transition-transform duration-300 text-sm
+              "
+          onClick={() => setIsCreateChannelDialogOpen(true)}
+        >
+          <PlusIcon strokeWidth={2.5} />
+          <span className="text-base">Kanal erstellen</span>
+        </Button>
+
+        {/* Dialog */}
+        {isCreateChannelDialogOpen && (
+          <div className="dialog-wrapper flex justify-center fixed inset-0 bg-black bg-opacity-50 z-50">
+            <div className="dialog bg-white p-6 rounded shadow-lg h-fit w-80 mt-[16%]">
+              <p className="text-xl font-bold mb-5">Neuer Kanal</p>
+
+              {createChannelErrorMessage && (
+                <div className="error-message bg-red-100 text-red-600 px-2 py-1.5 mb-3 w-full rounded leading-[1.35]">
+                  {createChannelErrorMessage}
+                </div>
+              )}
+
+              <input
+                type="text"
+                value={channelName}
+                onChange={(e) => setChannelName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleCreateChannel();
+                  }
+                }}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300 mb-5"
+                placeholder="Wie soll dein Kanal heißen?"
+                required
+              />
+              <div className="flex justify-end space-x-2 mt-2">
+                {/* Abbrechen Button */}
+                <button
+                  onClick={resetCreateChannelDialog}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Abbrechen
+                </button>
+
+                {/* Bestätigen Button */}
+                <button
+                  onClick={handleCreateChannel}
+                  disabled={!!createChannelErrorMessage}
+                  className="
+                  px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600
+                  disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70
+                "
+                >
+                  Bestätigen
+                </button>
               </div>
-            </motion.div>
-          ))}
-          {/* Chat room as card */}
-        </motion.div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

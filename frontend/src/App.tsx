@@ -5,14 +5,14 @@ import "./index.css";
 
 import LoginPage from "./components/LoginPage";
 import LandingPage from "./components/LandingPage";
-import ChatRoomPage from "./components/ChatRoomPage";
+import ChannelPage from "./components/ChannelPage";
 
 const App: React.FC = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route path="/chat-rooms" element={<LandingPage />} />
-      <Route path="/chat-room" element={<ChatRoomPage />} />
+      <Route path="/channels" element={<LandingPage />} />
+      <Route path="/channel" element={<ChannelPage />} />
     </Routes>
   </BrowserRouter>
 );
