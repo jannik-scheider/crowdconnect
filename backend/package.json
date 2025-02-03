@@ -15,9 +15,11 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "ioredis": "^5.4.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "@faker-js/faker": "^6.2.0"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "faker": "^6.6.6"
   }
 }

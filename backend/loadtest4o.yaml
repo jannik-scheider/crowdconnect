@@ -1,0 +1,35 @@
+config:
+  target: "https://api.crowdconnect.fun"
+  phases:
+    - duration: 10 # Run scenario for 10 seconds
+      arrivalRate: 20 # Create 20 virtual users per scenario
+  engines:
+   socketio-v3: {}
+  processor: "./custom.js" # set a custom processor to load dynamic scenario data
+
+scenarios:
+  - name: "Full Chat-Szenario"
+    engine: socketio-v3
+    flow:
+      - function: "getChatData" # load variables
+      - emit:
+          channel: "createUser"
+          data: "{{ name }}"
+        acknowledge: true
+      - emit:
+          channel: "joinChatRoom"
+          data: "loadtest"
+        acknowledge: true
+      - emit:
+          channel: "chatMessage"
+          data: "{{ greeting }}"
+      - think: 5
+      - emit:
+          channel: "chatMessage"
+          data: "{{ goodbye }}"
+      - emit:
+          channel: "leaveChatRoom"
+          data: "testroom"
+        acknowledge: true
+
+      - think: 5
