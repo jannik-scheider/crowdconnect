@@ -32,6 +32,7 @@ const pubClient = new Redis({
   host: "redis-12501.c55.eu-central-1-1.ec2.redns.redis-cloud.com",
   port: 12501,
   // User: "default",
+  username: "default",
   password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
   maxRetriesPerRequest: 100,
   // connectTimeout: 10000,
@@ -42,23 +43,22 @@ const pubClient = new Redis({
 });
 const subClient = pubClient.duplicate();
 
-pubClient.on("error", (err) => {
-  console.error("[Redis pubClient Error]:", err);
-});
-
-subClient.on("error", (err) => {
-  console.error("[Redis subClient Error]:", err);
-});
-
 const io = new Server(http, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true,
   },
+  // adapter: createAdapter(pubClient, subClient),
 });
 
-io.adapter(createAdapter(pubClient, subClient));
+// pubClient.on("error", (err) => {
+//   console.error("[Redis pubClient Error]:", err);
+// });
+
+// subClient.on("error", (err) => {
+//   console.error("[Redis subClient Error]:", err);
+// });
 
 io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
