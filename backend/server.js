@@ -43,7 +43,7 @@ subClient.on("error", (err) => {
 
 const io = new Server(http, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL, 
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -212,7 +212,7 @@ io.on("connection", (socket) => {
       });
   });
 
-  socket.on("chatMessage", async (message) => {
+  socket.on("chatMessage", async (payload) => {
     let user = null;
     let error = null;
     const hostname = os.hostname();
@@ -220,23 +220,21 @@ io.on("connection", (socket) => {
     try {
       user = await fetchUserById(socket.id);
     } catch (err) {
-      console.error(
-        "Linked user of received chat message could not be fetched:",
-        error
-      );
       error = err;
     }
-
     if (!user || error) {
       return;
     }
-
-    message = message + hostname;
+  
+    message = payload.message + hostname;
     io.to(user.roomName).emit("chatMessage", {
       username: user.username,
-      message,
+      message: message,
+      latency: payload.latency,
+      // Optional: serverReceiveTimestamp
     });
   });
+  
 
   socket.on("disconnect", async () => {
     console.log(`WebSocket connection disconnected: ${socket.id}`);

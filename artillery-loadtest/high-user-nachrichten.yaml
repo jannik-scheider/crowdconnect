@@ -1,0 +1,75 @@
+config:
+  target: "https://api.crowdconnect.fun"
+  phases:
+    - duration: 120 
+      arrivalRate: 2
+      rampTo: 8
+      name: "Phase 1 - Warm Up"
+    - duration: 180
+      arrivalRate: 8
+      name: "Phase 2 - Hauptlast"
+    - duration: 120
+      arrivalRate: 8
+      rampTo: 2
+      name: "Phase 3 - Cooldown"  
+  engines:
+   socketio-v3:
+      transports: ["websocket"] # Erzwinge WebSocket-Verbindungen
+  processor: "./custom.js" # set a custom processor to load dynamic scenario data
+
+
+scenarios:
+  - name: "Connections Test"
+    engine: socketio-v3
+    flow:
+      - function: "getChatData" # load variables
+      - emit:
+          channel: "createUser"
+          data: "{{ name }}"
+        acknowledge: true
+        timeout: 5000 # Timeout in Millisekunden (5 Sekunden)
+      - emit:
+          channel: "joinChatRoom"
+          data: "loadtest"
+        acknowledge: true
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "{{ greeting }}"
+            latency: "{{ latency }}"
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "test1test1test1test1"
+            latency: "{{ latency }}"
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "test2test2test2test2"
+            latency: "{{ latency }}"
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "test3test3test3test3"
+            latency: "{{ latency }}"
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "test4test4test4test4"
+            latency: "{{ latency }}"
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "test5test5test5test5"     
+            latency: "{{ latency }}"                         
+      - emit:
+          channel: "chatMessage"
+          data: 
+            message: "{{ goodbye }}"
+            latency: "{{ latency }}"
+      - think: 60
+      - emit:
+          channel: "leaveChatRoom"
+          data: "loadtest"
+        acknowledge: true
+

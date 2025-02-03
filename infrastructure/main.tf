@@ -205,8 +205,8 @@ resource "aws_ecs_task_definition" "live_chat_task" {
   family                   = "live-chat-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "1024"
+  memory                   = "2048"
 
   execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.live_chat_task_role.arn
@@ -215,8 +215,8 @@ resource "aws_ecs_task_definition" "live_chat_task" {
     {
       name      = "live-chat-container",
       image     = "${aws_ecr_repository.live_chat_repo.repository_url}:latest",
-      cpu       = 256,
-      memory    = 512,
+      cpu       = 1024,
+      memory    = 2048,
       essential = true,
       portMappings = [
         {
@@ -276,7 +276,7 @@ resource "aws_ecs_task_definition" "live_chat_task" {
     "metrics_collected": {
       "cpu": {
         "measurement": [
-          { "name": "usage_active", "rename": "CPUUtilization", "unit": "Percent" }
+          { "name": "cpu_usage_active", "rename": "CPUUtilization", "unit": "Percent" }
         ],
         "metrics_collection_interval": 1
       },

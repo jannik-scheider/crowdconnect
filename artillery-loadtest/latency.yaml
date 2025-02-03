@@ -1,11 +1,11 @@
 config:
-  target: "https://api.crowdconnect.fun"
+  target: "http://localhost:3000"
   phases:
-    - duration: 300              # Testdauer in Sekunden
-      arrivalRate: 10            # Anzahl neuer Verbindungen pro Sekunde
-      rampTo: 500     
+    - duration: 20 
+      arrivalRate: 2
   engines:
-   socketio-v3: {}
+   socketio-v3:
+      transports: ["websocket"] # Erzwinge WebSocket-Verbindungen
   processor: "./custom.js" # set a custom processor to load dynamic scenario data
 
 
@@ -18,4 +18,5 @@ scenarios:
           channel: "createUser"
           data: "{{ name }}"
         acknowledge: true
+        timeout: 10000 # Timeout in Millisekunden (5 Sekunden)
       - think: 5

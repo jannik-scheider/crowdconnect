@@ -1,17 +1,18 @@
 config:
   target: "https://api.crowdconnect.fun"
   phases:
-    - duration: 60
-      arrivalRate: 5
-      name: "Phase 1 - Stabile Last"
+    - duration: 60 
+      arrivalRate: 10
+      name: "Phase 1 - Warum Up"
+    - duration: 120
+      arrivalRate: 40
+      name: "Phase 2 - Hauptlast"
     - duration: 60
       arrivalRate: 10
-      name: "Phase 2 - Erhöhte Last"
-    - duration: 60
-      arrivalRate: 15
-      name: "Phase 3 - Hohe Last"  
+      name: "Phase 3 - Cooldown"  
   engines:
-   socketio-v3: {}
+   socketio-v3:
+      transports: ["websocket"] # Erzwinge WebSocket-Verbindungen
   processor: "./custom.js" # set a custom processor to load dynamic scenario data
 
 
@@ -24,4 +25,6 @@ scenarios:
           channel: "createUser"
           data: "{{ name }}"
         acknowledge: true
-      - think: 5
+        timeout: 10000 # Timeout in Millisekunden (10 Sekunden)
+
+      - think: 30

@@ -10,16 +10,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^6.2.0",
     "@socket.io/redis-adapter": "^8.3.0",
+    "artillery-engine-socketio-v3": "^1.2.0",
     "aws-sdk": "^2.1692.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "ioredis": "^5.4.2",
-    "socket.io": "^4.8.1",
-    "@faker-js/faker": "^6.2.0"
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "faker": "^6.6.6"
+    "faker": "^6.6.6",
+    "ts-node": "^10.9.2"
   }
 }

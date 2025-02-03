@@ -15,6 +15,7 @@ import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
 interface Message {
   username: string;
   message: string;
+  latency: number;
 }
 
 const ChatRoomPage: React.FC = () => {
@@ -42,23 +43,35 @@ const ChatRoomPage: React.FC = () => {
 
   useEffect(() => {
     function onChatMessageEvent(message: Message) {
+      const now = Date.now();
+      
+      // Die Zeit, die zwischen "Abschicken bei X" und "Angekommen/Angezeigt bei Y" vergangen ist
+      const latencyMs = now - message.latency; 
+      console.log("Latenz (ms):", latencyMs);
+    
       setMessages((prev) => [
         ...prev,
-        { username: message.username, message: message.message },
+        {
+          username: message.username,
+          message: message.message,
+          // Optional: latency für Debug oder Anzeige verwenden
+          latency: message.latency,
+        },
       ]);
     }
+    
 
     function onUserJoinedEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat betreten.` },
+        { username: "System", message: `${username} hat den Chat betreten.`, latency: Date.now() },
       ]);
     }
 
     function onUserLeftEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat verlassen.` },
+        { username: "System", message: `${username} hat den Chat verlassen.`,  latency: Date.now()},
       ]);
     }
 
@@ -69,6 +82,7 @@ const ChatRoomPage: React.FC = () => {
           username: "System",
           message:
             "Dieser Chatroom wurde gelöscht und wird in 5 Sekunden geschlossen.",
+          latency: Date.now()
         },
       ]);
 
@@ -104,12 +118,18 @@ const ChatRoomPage: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // ChatRoomPage.tsx (Ausschnitt)
   const sendMessage = () => {
     if (message.trim()) {
-      socket.emit("chatMessage", message);
+      const payload = {
+        message: message,
+        latency: Date.now(), // Zeitstempel in Millisekunden
+      };
+      socket.emit("chatMessage", payload);
       setMessage("");
     }
   };
+
 
   const leaveChatRoom = () => {
     socket.emit("leaveChatRoom", roomName, (error: unknown) => {

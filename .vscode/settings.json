@@ -8,7 +8,16 @@
             "file:///c%3A/Users/janni/git/live-chat/backend/loadtest4o.yaml",
             "file:///c%3A/Users/janni/git/live-chat/backend/nachrichtentest.yaml",
             "file:///c%3A/Users/janni/git/live-chat/backend/verbindungstest.yaml",
-            "file:///c%3A/Users/janni/git/live-chat/backend/breaking-point.yaml"
+            "file:///c%3A/Users/janni/git/live-chat/backend/breaking-point.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/breaking-point.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/loadtest4o.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/nachrichtentest.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/verbindungstest.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/low-user.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/low-user-nachrichten.yaml",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/latency.yaml",
+            "git:/c%3A/Users/janni/git/live-chat/backend/verbindungstest.yaml?%7B%22path%22%3A%22c%3A%5C%5CUsers%5C%5Cjanni%5C%5Cgit%5C%5Clive-chat%5C%5Cbackend%5C%5Cverbindungstest.yaml%22%2C%22ref%22%3A%22HEAD%22%7D",
+            "file:///c%3A/Users/janni/git/live-chat/artillery-loadtest/high-user-nachrichten.yaml"
         ]
     }
 }
