@@ -281,13 +281,13 @@ const ChannelPage: React.FC = () => {
         </motion.div>
       )}
 
-      <motion.div className="flex flex-col min-w-[60%] grow mx-4">
+      <motion.div className="flex flex-col gap-4 min-w-[60%] grow mx-4">
         {channelOwnerId === socket.id && (
           <p className="text-white text-4xl font-semibold">Stream Preview</p>
         )}
 
         <iframe
-          className="rounded h-full mt-4"
+          className="rounded h-full"
           src={`https://player.twitch.tv/?channel=${"NoWay4u_Sir"}&parent=${"localhost"}`}
           width="100%"
           allowFullScreen

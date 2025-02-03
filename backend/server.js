@@ -49,16 +49,16 @@ const io = new Server(http, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  // adapter: createAdapter(pubClient, subClient),
+  adapter: createAdapter(pubClient, subClient),
 });
 
-// pubClient.on("error", (err) => {
-//   console.error("[Redis pubClient Error]:", err);
-// });
+pubClient.on("error", (err) => {
+  console.error("[Redis pubClient Error]:", err);
+});
 
-// subClient.on("error", (err) => {
-//   console.error("[Redis subClient Error]:", err);
-// });
+subClient.on("error", (err) => {
+  console.error("[Redis subClient Error]:", err);
+});
 
 io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
