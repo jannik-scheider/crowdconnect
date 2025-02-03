@@ -1,0 +1,23 @@
+config:
+  target: "https://api.crowdconnect.fun"
+  phases:
+    - duration: 240 
+      arrivalRate: 2
+  engines:
+   socketio-v3:
+      transports: ["websocket"] # Erzwinge WebSocket-Verbindungen
+  processor: "./custom.js" # set a custom processor to load dynamic scenario data
+
+
+scenarios:
+  - name: "Connections Test"
+    engine: socketio-v3
+    flow:
+      - function: "getChatData" # load variables
+      - emit:
+          channel: "createUser"
+          data: "{{ name }}"
+        acknowledge: true
+        timeout: 5000 # Timeout in Millisekunden (5 Sekunden)
+
+      - think: 60

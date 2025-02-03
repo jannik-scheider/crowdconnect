@@ -1,0 +1,58 @@
+config:
+  target: "https://api.crowdconnect.fun"
+  phases:
+    - duration: 60 
+      arrivalRate: 5
+      name: "Phase 1 - Warum Up"
+    - duration: 120
+      arrivalRate: 15
+      name: "Phase 2 - Hauptlast"
+    - duration: 60
+      arrivalRate: 5
+      name: "Phase 3 - Cooldown"  
+  engines:
+   socketio-v3: {}
+  processor: "./custom.js" # set a custom processor to load dynamic scenario data
+
+
+scenarios:
+  - name: "Messages Test"
+    engine: socketio-v3
+    flow:
+      - function: "getChatData" # load variables
+      - emit:
+          channel: "createUser"
+          data: "{{ name }}"
+        acknowledge: true
+        timeout: 5000 
+      - emit:
+          channel: "joinChatRoom"
+          data: "loadtest"
+        acknowledge: true
+      - emit:
+          channel: "chatMessage"
+          data: "{{ greeting }}"
+      - emit:
+          channel: "chatMessage"
+          data: "test1test1test1test1"
+      - emit:
+          channel: "chatMessage"
+          data: "test2test2test2test2"
+      - emit:
+          channel: "chatMessage"
+          data: "test3test3test3test3"
+      - emit:
+          channel: "chatMessage"
+          data: "test4test4test4test4"
+      - emit:
+          channel: "chatMessage"
+          data: "test5test5test5test5"                              
+      - emit:
+          channel: "chatMessage"
+          data: "{{ goodbye }}"
+      - emit:
+          channel: "leaveChatRoom"
+          data: "loadtest"
+        acknowledge: true
+
+      - think: 30
