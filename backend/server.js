@@ -247,10 +247,11 @@ io.on("connection", (socket) => {
     let user = null;
     let error = null;
     const hostname = os.hostname();
-
+    console.log(payload);
     try {
       user = await fetchUserById(socket.id);
     } catch (err) {
+      console.error("Linked user of received chat message could not be fetched:", error);
       error = err;
     }
     if (!user || error) {
