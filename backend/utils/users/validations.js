@@ -1,4 +1,4 @@
-const { fetchChatRoomByName } = require("../chat-rooms/chat-rooms.js");
+const { fetchChannelByName } = require("../channels/channels.js");
 
 // const { fetchUserById } = require("../users/users.js");
 

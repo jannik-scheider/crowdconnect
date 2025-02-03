@@ -7,31 +7,50 @@ const { Redis } = require("ioredis");
 require("dotenv").config();
 const os = require("os");
 
-// import { ChatRoom } from "./utils/rooms";
+// import { Channel } from "./utils/channels";
 
 const {
   createUser, 
   deleteUser,
-  assignRoomToUser,
-  removeRoomFromUser,
+  assignChannelToUser,
+  removeChannelFromUser,
   fetchUserById,
-  fetchUsersInRoom,
+  fetchUsersInChannel,
 } = require("./utils/users/users");
 
 const {
-  chatRoomsEmitter,
-  createChatRoom,
-  deleteChatRoom,
-  fetchChatRooms,
-  fetchChatRoomByName,
-  deleteChatRoomsWithOwner,
-} = require("./utils/chat-rooms/chat-rooms");
+  channelsEmitter,
+  fetchChannels,
+  fetchChannelByName,
+  createChannel,
+  setIsLiveAttributeValue,
+  deleteChannel,
+  deleteChannelsWithOwner,
+} = require("./utils/channels/channels");
 
 const pubClient = new Redis({
-  host: process.env.REDIS_ENDPOINT,
-  port: 6379,
+  host: "redis-12501.c55.eu-central-1-1.ec2.redns.redis-cloud.com",
+  port: 12501,
+  // User: "default",
+  username: "default",
+  password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
+  maxRetriesPerRequest: 100,
+  // connectTimeout: 10000,
+  // commandTimeout: 5000,
+
+  // host: process.env.REDIS_ENDPOINT,
+  // port: 6379,
 });
 const subClient = pubClient.duplicate();
+
+const io = new Server(http, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+  adapter: createAdapter(pubClient, subClient),
+});
 
 pubClient.on("error", (err) => {
   console.error("[Redis pubClient Error]:", err);
@@ -40,16 +59,6 @@ pubClient.on("error", (err) => {
 subClient.on("error", (err) => {
   console.error("[Redis subClient Error]:", err);
 });
-
-const io = new Server(http, {
-  cors: {
-    origin: process.env.FRONTEND_URL, 
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-io.adapter(createAdapter(pubClient, subClient));
 
 io.on("connection", (socket) => {
   console.log(`New WebSocket connection: ${socket.id}`);
@@ -70,25 +79,30 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("getChatRoomsInfo", (callback) => {
-    _getChatRoomsInfo()
-      .then((roomsInfo) => {
-        return callback(roomsInfo);
+  socket.on("getChannelsInfo", (callback) => {
+    _getChannelsInfo()
+      .then((channelsInfo) => {
+        return callback(channelsInfo);
       })
       .catch((error) => {
-        console.error("Getting chat rooms info failed:", error);
+        console.error("Getting channels info failed:", error);
         return callback(
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
         );
       });
   });
 
-  socket.on("createChatRoom", async (roomName, callback) => {
+  socket.on("createChannel", async (channelName, callback) => {
+    let newChannel = null;
     try {
-      await createChatRoom({ name: roomName, ownerId: socket.id });
+      newChannel = await createChannel({
+        name: channelName,
+        ownerId: socket.id,
+        isLive: false,
+      });
     } catch (error) {
       console.error(
-        `Creating chat room '${roomName}' failed:`,
+        `Creating channel '${channelName}' failed:`,
         error.cause || error
       );
       return callback(
@@ -96,116 +110,133 @@ io.on("connection", (socket) => {
       );
     }
 
-    _getChatRoomsInfo()
-      .then((roomsInfo) => {
-        io.emit("updatedChatRooms", roomsInfo);
+    _getChannelsInfo()
+      .then((channelsInfo) => {
+        // Benutzer sollen nur Live-Kanäle angezeigt bekommen
+        socket.emit("updatedChannels", channelsInfo);
         return callback();
       })
       .catch((error) => {
-        console.error(`Creating chatroom '${roomName}' failed:`, error);
+        console.error(`Creating channel '${channelName}' failed:`, error);
         return callback(
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
         );
       });
   });
 
-  socket.on("deleteChatRoom", async (roomName, callback) => {
-    let room = null;
+  socket.on("deleteChannel", async (channelName, callback) => {
+    let channel = null;
     try {
-      room = await fetchChatRoomByName(roomName);
+      channel = await fetchChannelByName(channelName);
     } catch (error) {
-      `Could not delete the chat room '${roomName}' because an error occured while tryig to fetch the chat room with the name '${roomName}' from the database:`,
-        { cause: error };
+      console.error(
+        `Could not delete the channel '${channelName}' because an error occured while tryig to fetch the channel with the name '${channelName}' from the database:`,
+        error
+      );
       return callback(
-        "Der Chatroom konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
+        "Der Channel konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
       );
     }
 
-    // Check if the user is the owner and therefore allowed to delete the chat room
-    if (socket.id !== room.ownerId) {
+    // Check if the user is the owner and therefore allowed to delete the channel
+    if (socket.id !== channel.ownerId) {
       return callback(
-        "Der Chatroom konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
+        "Der Channel konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
       );
     }
 
     try {
-      await deleteChatRoom(roomName);
+      await deleteChannel(channelName);
     } catch (error) {
-      console.error("Deleting chat room failed:", error);
+      console.error("Deleting channel failed:", error);
       return callback(
-        "Der Chatroom konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
+        "Der Channel konnte nicht gelöscht werden, weil ein unerwarteter Fehler aufgetreten ist."
       );
     }
 
-    _getChatRoomsInfo()
-      .then((roomsInfo) => {
-        io.emit("updatedChatRooms", roomsInfo);
+    _getChannelsInfo()
+      .then((channelsInfo) => {
+        io.emit("updatedChannels", channelsInfo);
         return callback();
       })
       .catch((error) => {
-        console.error(`Deleting chatroom '${roomName}' failed:`, error);
+        console.error(`Deleting channel '${channelName}' failed:`, error);
         return callback(
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
         );
       });
   });
 
-  socket.on("joinChatRoom", async (roomName, callback) => {
+  socket.on("joinChannel", async (channelName, callback) => {
     let user = null;
 
     try {
-      user = await assignRoomToUser(socket.id, roomName);
+      user = await assignChannelToUser(socket.id, channelName);
+      await setIsLiveAttributeValue(channelName, true);
     } catch (error) {
       console.error(
-        `Assigning room '${roomName}' to user with ID '${socket.id}' failed:`,
+        `Assigning channel '${channelName}' to user with ID '${socket.id}' failed:`,
         error.cause || error
       );
       return callback(
         error.userMessage ||
-          "Der Chatroom konnte nicht beigetreten werden, weil ein unerwarteter Fehler aufgetreten ist."
+          "Der Channel konnte nicht beigetreten werden, weil ein unerwarteter Fehler aufgetreten ist."
       );
     }
 
-    socket.join(user.roomName);
+    socket.join(user.channelName);
 
-    socket.emit("message", `Welcome to the chat room '${roomName}'!`);
-    socket.broadcast.to(user.roomName).emit("userJoined", user.username);
+    socket.emit("message", `Welcome to the channel '${channelName}'!`);
+    socket.broadcast.to(user.channelName).emit("userJoined", user.username);
 
-    _getChatRoomsInfo()
-      .then((roomsInfo) => {
-        io.emit("updatedChatRooms", roomsInfo);
+    _getChannelsInfo()
+      .then((channelsInfo) => {
+        io.emit("updatedChannels", channelsInfo);
         return callback();
       })
       .catch((error) => {
-        console.error(`Joining chatroom '${roomName}' failed:`, error);
+        console.error(`Joining channel '${channelName}' failed:`, error);
         return callback(
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
         );
       });
   });
 
-  socket.on("leaveChatRoom", async (roomName, callback) => {
+  socket.on("leaveChannel", async (channelName, callback) => {
     let user = null;
     try {
-      user = await removeRoomFromUser(socket.id, roomName);
+      user = await removeChannelFromUser(socket.id, channelName);
     } catch (error) {
-      console.error("Leaving chat room failed:", error.cause | error);
+      console.error("Leaving channel failed:", error.cause | error);
       return callback(
         error.userMessage ||
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu."
       );
     }
 
-    socket.leave(user.roomName);
-    socket.broadcast.to(roomName).emit("userLeft", user.username);
+    socket.leave(channelName);
 
-    _getChatRoomsInfo()
-      .then((roomsInfo) => {
-        io.emit("updatedChatRooms", roomsInfo);
+    let channel = null;
+    try {
+      channel = await fetchChannelByName(channelName);
+    } catch (error) {
+      console.error(`Fetching channel '${channelName}' failed:`, error);
+    }
+
+    if (channel.ownerId === socket.id) {
+      socket.broadcast.to(channelName).emit("channelOwnerLeft", user.username);
+      await setIsLiveAttributeValue(channelName, false);
+    } else {
+      socket.broadcast.to(channelName).emit("userLeft", user.username);
+    }
+
+    _getChannelsInfo()
+      .then((channelsInfo) => {
+        io.emit("updatedChannels", channelsInfo);
         return callback();
       })
       .catch((error) => {
-        console.error(`Leaving chatroom '${roomName}' failed:`, error);
+        console.error(`Leaving channel '${channelName}' failed:`, error);
         return callback(
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
         );
@@ -225,13 +256,12 @@ io.on("connection", (socket) => {
     if (!user || error) {
       return;
     }
-  
+
     message = payload.message + hostname;
-    io.to(user.roomName).emit("chatMessage", {
+    io.to(user.channelName).emit("chatMessage", {
       username: user.username,
       message: message,
-      latency: payload.latency,
-      // Optional: serverReceiveTimestamp
+      latency: payload.latency
     });
   });
   
@@ -241,7 +271,7 @@ io.on("connection", (socket) => {
 
     try {
       await deleteUser(socket.id);
-      await deleteChatRoomsWithOwner(socket.id);
+      await deleteChannelsWithOwner(socket.id);
     } catch (error) {
       console.error(
         `Deleting disconnecting user with ID '${socket.id}' failed:`,
@@ -250,42 +280,56 @@ io.on("connection", (socket) => {
     }
 
     // TODO: Keine try...catch-Fehlerbehandlung?
-    const updatedChatRooms = await _getChatRoomsInfo();
-    socket.broadcast.emit("updatedChatRooms", updatedChatRooms);
+    const updatedChannels = await _getChannelsInfo();
+    socket.broadcast.emit("updatedChannels", updatedChannels);
   });
 });
 
-chatRoomsEmitter.on("deletedRoom", (roomName) => {
-  io.to(roomName).emit("chatRoomDeleted");
+channelsEmitter.on("deletedChannel", (channelName) => {
+  io.to(channelName).emit("channelDeleted");
 });
 
-async function _getChatRoomsInfo() {
-  let chatRoomsInfo = [];
+async function _getChannelsInfo() {
+  let channelsInfo = [];
 
-  let allChatRooms = [];
+  let allChannels = [];
   try {
-    allChatRooms = await fetchChatRooms();
+    allChannels = await fetchChannels();
   } catch (error) {
-    console.error(`Getting info for chat room '${roomName}' failed:`, error);
+    console.error("Getting channels info failed:", error);
     throw error;
   }
 
-  chatRoomsInfo = await Promise.all(
-    allChatRooms.map(async (room) => {
+  channelsInfo = await Promise.all(
+    allChannels.map(async (channel) => {
       try {
-        const users = await fetchUsersInRoom(room.name);
-        return { userCount: users.length, ...room };
+        const usersWithoutOwner = (
+          await fetchUsersInChannel(channel.name)
+        ).filter((user) => user.id !== channel.ownerId);
+        const owner = await fetchUserById(channel.ownerId);
+
+        if (!owner) {
+          throw new Error(
+            `A user with the ID ${channel.ownerId} does not exist.`
+          );
+        }
+
+        return {
+          ownerName: owner.username,
+          userCount: usersWithoutOwner.length,
+          ...channel,
+        };
       } catch (error) {
         console.error(
-          `An error occured while trying to get the chat rooms info: Fetching users in room '${room.name}' failed:`,
+          `An error occured while trying to get the channels info:`,
           error
         );
-        return { userCount: null, ...room };
+        return { ownerName: "", userCount: null, ...channel };
       }
     })
   );
 
-  return chatRoomsInfo;
+  return channelsInfo;
 }
 
 app.get("/health", (req, res) => {
