@@ -7,6 +7,12 @@ import { getSocket } from "../socket";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+interface ServerResponse {
+  status: string;
+  message: string;
+}
+
+
 const LoginPage: React.FC = () => {
   // const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,11 +41,13 @@ const LoginPage: React.FC = () => {
 
     const username = event.currentTarget.username.value;
 
-    socket.emit("createUser", username, (errorMessage: string) => {
+    socket.emit("createUser", username, (response: ServerResponse) => {
       setIsSubmitting(false);
 
-      if (errorMessage) {
-        return setErrorMessage(errorMessage);
+      if (response.status === "success") {
+        console.log("Server acknowledged:", response.message);
+      } else {
+        return setErrorMessage(response.message);
       }
       navigate("/channels", { state: { username } });
     });

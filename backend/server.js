@@ -8,7 +8,7 @@ require("dotenv").config();
 const os = require("os");
 
 const {
-  createUser,
+  createUser, 
   deleteUser,
   removeChannelFromUser,
   fetchUserById,
@@ -78,14 +78,15 @@ io.on("connection", (socket) => {
   socket.on("createUser", async (username, callback) => {
     try {
       await createUser({ id: socket.id, username });
-      callback();
+      callback({status: "success", message: "user created"});
     } catch (error) {
       console.error("Creating user failed:", error.cause || error);
 
       // TODO: Benutzer-Fehlermeldung erzeugen und ausgeben
-      return callback(
+      callback({status: "error", message:
         error.userErrorMessage ||
           "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+      }
       );
     }
   });
@@ -277,31 +278,29 @@ io.on("connection", (socket) => {
       });
   });
 
-  socket.on("chatMessage", async (message) => {
+  socket.on("chatMessage", async (payload) => {
     let user = null;
     let error = null;
     const hostname = os.hostname();
-
+    console.log(payload);
     try {
       user = await fetchUserById(socket.id);
     } catch (err) {
-      console.error(
-        "Linked user of received chat message could not be fetched:",
-        error
-      );
+      console.error("Linked user of received chat message could not be fetched:", error);
       error = err;
     }
-
     if (!user || error) {
       return;
     }
 
-    message = message + hostname;
+    message = payload.message + hostname;
     io.to(user.channelName).emit("chatMessage", {
       username: user.username,
-      message,
+      message: message,
+      latency: payload.latency
     });
   });
+  
 
   socket.on("disconnect", async () => {
     console.log(`WebSocket connection disconnected: ${socket.id}`);

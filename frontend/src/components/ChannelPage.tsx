@@ -22,6 +22,7 @@ interface ChannelInfo {
 interface Message {
   username: string;
   message: string;
+  latency: number;
 }
 
 const ChannelPage: React.FC = () => {
@@ -89,16 +90,27 @@ const ChannelPage: React.FC = () => {
 
   useEffect(() => {
     function onChatMessageEvent(message: Message) {
+      const now = Date.now();
+      
+      // Die Zeit, die zwischen "Abschicken bei X" und "Angekommen/Angezeigt bei Y" vergangen ist
+      const latencyMs = now - message.latency; 
+      console.log("Latenz (ms):", latencyMs);
+    
       setMessages((prev) => [
         ...prev,
-        { username: message.username, message: message.message },
+        {
+          username: message.username,
+          message: message.message,
+          // Optional: latency für Debug oder Anzeige verwenden
+          latency: message.latency,
+        },
       ]);
     }
 
     function onUserJoinedEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat betreten.` },
+        { username: "System", message: `${username} hat den Chat betreten.`, latency: Date.now() },
       ]);
     }
 
@@ -109,6 +121,7 @@ const ChannelPage: React.FC = () => {
           username: "System",
           message:
             "Der Host hat den Channel verlassen. Der Channel wird in 5 Sekunden geschlossen.",
+          latency: Date.now()
         },
       ]);
 
@@ -118,7 +131,7 @@ const ChannelPage: React.FC = () => {
     function onUserLeftEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat verlassen.` },
+        { username: "System", message: `${username} hat den Chat verlassen.`,  latency: Date.now()},
       ]);
     }
 
@@ -133,7 +146,8 @@ const ChannelPage: React.FC = () => {
         {
           username: "System",
           message:
-            "Dieser Channel wurde gelöscht und wird in 5 Sekunden geschlossen.",
+            "Dieser Chatroom wurde gelöscht und wird in 5 Sekunden geschlossen.",
+          latency: Date.now()
         },
       ]);
 
@@ -177,7 +191,11 @@ const ChannelPage: React.FC = () => {
 
   const sendMessage = () => {
     if (message.trim()) {
-      socket.emit("chatMessage", message);
+      const payload = {
+        message: message,
+        latency: Date.now(), // Zeitstempel in Millisekunden
+      };
+      socket.emit("chatMessage", payload);
       setMessage("");
     }
   };
