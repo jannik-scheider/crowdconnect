@@ -14,8 +14,8 @@ import { getSocket } from "../socket";
 import { Button } from "./ui/button";
 
 interface ChannelInfo {
-  ownerName: string;
-  userCount: number;
+  ownerName: string | null;
+  userCount: number | null;
   name: string;
   ownerId: string;
   isLive: boolean;

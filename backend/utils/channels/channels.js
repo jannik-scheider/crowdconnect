@@ -44,10 +44,6 @@ const setIsLiveAttributeValue = async (channelName, value) => {
   // Clean channel name
   channelName = channelName.trim().toLowerCase();
 
-  // Check for existing channel
-  // TODO
-  // await validateChannelExists(channelName);
-
   const channel = await setItemAttribute(
     TABLE_NAME,
     { name: channelName },

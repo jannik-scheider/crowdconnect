@@ -13,8 +13,6 @@ const {
   removeItemAttribute,
 } = require("../../dynamodb.js");
 
-const { validateChannelExists } = require("../channels/validations.js");
-
 const {
   validateUserNotExists,
   validateUsernameNotExists,
@@ -36,16 +34,12 @@ const createUser = async ({ id: userId, username }) => {
     );
   }
 
-  // Check for existing user
+  // Check for existing user and username
   try {
-    await validateUserNotExists(userId);
-  } catch (error) {
-    throw new Error("Creating user failed:", { cause: error });
-  }
-
-  // Check for existing username
-  try {
-    await validateUsernameNotExists(username);
+    await Promise.all([
+      validateUserNotExists(userId),
+      validateUsernameNotExists(username),
+    ]);
   } catch (error) {
     throw new Error("Creating user failed:", { cause: error });
   }
@@ -63,31 +57,6 @@ const deleteUser = async (userId) => {
       `Could not delete user because the user with the user ID '${userId}' was not found.`
     );
   }
-};
-
-const assignChannelToUser = async (userId, channelName) => {
-  // Validate channel name
-  if (!channelName) {
-    throw new UserValidationError(
-      `Could not assign channel to the user with the ID '${userId}' because the given channel name is empty.`
-    );
-  }
-
-  // Clean channel name
-  channelName = channelName.trim().toLowerCase();
-
-  // Check for existing channel
-  await validateChannelExists(channelName);
-
-  const user = await setItemAttribute(
-    TABLE_NAME,
-    { id: userId },
-    // TODO: Heißt das Datenbankattribut nicht "name"?
-    "channelName",
-    channelName
-  );
-
-  return user;
 };
 
 const removeChannelFromUser = async (userId, channelName) => {
@@ -138,23 +107,9 @@ const _fetchUsersByUsername = (username) => {
   );
 };
 
-const fetchUsersInChannel = (channelName) => {
-  // TODO: Heißt das Datenbankattribut nicht "name"?
-  return fetchItemsByAttributeValue(
-    TABLE_NAME,
-    "channelName",
-    channelName
-  ).catch((error) => {
-    console.error(`Fetching users in channel '${channelName}' failed: `, error);
-    throw error;
-  });
-};
-
 module.exports = {
   createUser,
   deleteUser,
-  assignChannelToUser,
   removeChannelFromUser,
   fetchUserById,
-  fetchUsersInChannel,
 };
