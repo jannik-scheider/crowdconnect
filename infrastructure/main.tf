@@ -443,6 +443,36 @@ resource "aws_ecs_service" "live_chat_service" {
 }
 
 
+# 10. Skalierbarkeit für den ECS-Service definieren
+
+resource "aws_appautoscaling_target" "ecs_service_target" {
+  max_capacity       = 2
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.live_chat_cluster.name}/${aws_ecs_service.live_chat_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_service_policy" {
+  name               = "ecs-service-scaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_service_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_service_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_service_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 60.0
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    scale_in_cooldown  = 60
+    scale_out_cooldown = 60
+  }
+}
+
+
 # 9. IAM Role für Task-Execution
 # Verwende die bestehende Rolle ecsTaskExecutionRole
 data "aws_iam_role" "ecs_task_execution_role" {
@@ -493,27 +523,37 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   wait_for_deployment = true
 
-  # Default Cache Behavior
+  # Standard Cache Behavior
   default_cache_behavior {
-    allowed_methods = ["GET", "HEAD", "OPTIONS"]
-    cached_methods  = ["GET", "HEAD", "OPTIONS"]
-
-    # Use a managed cache policy (example: CachingOptimized)...
-    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-
-    # ...and attach your custom origin request policy to forward cookies.
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD", "OPTIONS"]
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = aws_cloudfront_origin_request_policy.forward_all_cookies.id
-
-    # The ID of the origin to which you want to forward requests
-    target_origin_id       = aws_s3_bucket.main.bucket
-    viewer_protocol_policy = "redirect-to-https"
+    target_origin_id         = aws_s3_bucket.main.bucket
+    viewer_protocol_policy   = "redirect-to-https"
   }
 
-  # Your existing S3 origin
+  # S3 Origin
   origin {
     domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
     origin_id                = aws_s3_bucket.main.bucket
+  }
+
+  # Hier definierst du die Custom Error Responses 
+  # für 403 und 404, damit CloudFront stattdessen deine index.html ausliefert.
+  custom_error_response {
+    error_code            = 403
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 0
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 0
   }
 
   restrictions {
@@ -528,6 +568,7 @@ resource "aws_cloudfront_distribution" "main" {
     ssl_support_method       = "sni-only"
   }
 }
+
 
 resource "aws_cloudfront_origin_access_control" "main" {
   name                              = "s3-cloudfront-oac"
@@ -630,7 +671,7 @@ resource "aws_elasticache_cluster" "redis_cluster" {
 ##### dynamodb
 
 resource "aws_dynamodb_table" "users" {
-  name         = "Users2"
+  name         = "Users"
   billing_mode = "PAY_PER_REQUEST"
 
   attribute {

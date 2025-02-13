@@ -20,7 +20,7 @@ scenarios:
         acknowledge: true
         timeout: 5000 # Timeout in Millisekunden (5 Sekunden)
       - emit:
-          channel: "joinChatRoom"
+          channel: "joinChannel"
           data: "loadtest"
         acknowledge: true
       - emit:
@@ -60,7 +60,7 @@ scenarios:
             latency: "{{ latency }}"
       - think: 60
       - emit:
-          channel: "leaveChatRoom"
+          channel: "leaveChannel"
           data: "loadtest"
         acknowledge: true
 

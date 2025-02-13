@@ -24,18 +24,15 @@ const {
   deleteChannelsWithOwner,
 } = require("./utils/channels/channels");
 
+
 const app = express();
 const httpServer = http.createServer();
 
 const PORT = process.env.PORT || 3000;
 
-// import { Channel } from "./utils/channels";
-
 const redisClient = new Redis({
-  host: "redis-12501.c55.eu-central-1-1.ec2.redns.redis-cloud.com",
-  port: 12501,
-  username: "default",
-  password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
+  host: process.env.REDIS_ENDPOINT,
+  port: 6379,
 });
 
 // const redisClient = new Redis({
@@ -57,7 +54,7 @@ const subClient = redisClient.duplicate();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
