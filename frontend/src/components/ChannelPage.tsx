@@ -202,7 +202,7 @@ const ChannelPage: React.FC = () => {
   const sendMessage = () => {
     if (message.trim()) {
       const payload = {
-        message: message,
+        newMessage: message,
         latency: Date.now(), // Zeitstempel in Millisekunden
       };
       socket.emit("chatMessage", { payload, channelName });

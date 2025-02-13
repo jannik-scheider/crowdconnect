@@ -24,7 +24,6 @@ const {
   deleteChannelsWithOwner,
 } = require("./utils/channels/channels");
 
-
 const app = express();
 const httpServer = http.createServer();
 
@@ -323,10 +322,10 @@ io.on("connection", (socket) => {
       return;
     }
 
-    message = data.payload.message + hostname;
-    io.to(channelName).emit("chatMessage", {
+    message = data.payload.newMessage;
+    io.to(data.channelName).emit("chatMessage", {
       username: user.username,
-      message: message,
+      message,
       latency: data.payload.latency,
     });
   });
