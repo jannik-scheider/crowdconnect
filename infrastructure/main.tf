@@ -419,7 +419,7 @@ resource "aws_ecs_service" "live_chat_service" {
   name            = "live-chat-service"
   cluster         = aws_ecs_cluster.live_chat_cluster.id
   task_definition = aws_ecs_task_definition.live_chat_task.arn
-  desired_count   = 2
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -440,6 +440,36 @@ resource "aws_ecs_service" "live_chat_service" {
   depends_on = [aws_lb_listener.live_chat_https_listener,
     aws_lb_listener.live_chat_http_listener
   ]
+}
+
+
+# 10. Skalierbarkeit für den ECS-Service definieren
+
+resource "aws_appautoscaling_target" "ecs_service_target" {
+  max_capacity       = 2
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.live_chat_cluster.name}/${aws_ecs_service.live_chat_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_service_policy" {
+  name               = "ecs-service-scaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_service_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_service_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_service_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 60.0
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    scale_in_cooldown  = 60
+    scale_out_cooldown = 60
+  }
 }
 
 

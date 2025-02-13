@@ -29,23 +29,14 @@ const {
 } = require("./utils/channels/channels");
 
 const pubClient = new Redis({
-  host: "redis-12501.c55.eu-central-1-1.ec2.redns.redis-cloud.com",
-  port: 12501,
-  // User: "default",
-  username: "default",
-  password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
-  maxRetriesPerRequest: 100,
-  // connectTimeout: 10000,
-  // commandTimeout: 5000,
-
-  // host: process.env.REDIS_ENDPOINT,
-  // port: 6379,
+  host: process.env.REDIS_ENDPOINT,
+  port: 6379,
 });
 const subClient = pubClient.duplicate();
 
 const io = new Server(http, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
