@@ -24,23 +24,4 @@ class InputValidationError extends Error {
   }
 }
 
-const validateChannelExists = async (channelName) => {
-  let existingChannel = null;
-
-  try {
-    existingChannel = await fetchChannelByName(channelName);
-  } catch (error) {
-    throw new UserValidationError(
-      `Could not validate that the channel with the name '${channelName}' does not exist because an error occured while tryig to fetch the channel with the name '${channelName}' from the database:`,
-      { cause: error }
-    );
-  }
-
-  if (!existingChannel) {
-    throw new UserValidationError(
-      `A channel with the name '${channelName}' does not exist.`
-    );
-  }
-};
-
-module.exports = { validateChannelExists };
+module.exports = {};

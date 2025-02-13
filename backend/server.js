@@ -1,21 +1,17 @@
 const express = require("express");
-const app = express();
-const http = require("http").createServer(app);
+const http = require("http");
 const { Server } = require("socket.io");
+const socketio = require("socket.io");
 const { createAdapter } = require("@socket.io/redis-adapter");
-const { Redis } = require("ioredis");
+const Redis = require("ioredis");
 require("dotenv").config();
 const os = require("os");
-
-// import { Channel } from "./utils/channels";
 
 const {
   createUser, 
   deleteUser,
-  assignChannelToUser,
   removeChannelFromUser,
   fetchUserById,
-  fetchUsersInChannel,
 } = require("./utils/users/users");
 
 const {
@@ -28,13 +24,35 @@ const {
   deleteChannelsWithOwner,
 } = require("./utils/channels/channels");
 
-const pubClient = new Redis({
+
+const app = express();
+const httpServer = http.createServer();
+
+const PORT = process.env.PORT || 3000;
+
+const redisClient = new Redis({
   host: process.env.REDIS_ENDPOINT,
   port: 6379,
 });
-const subClient = pubClient.duplicate();
 
-const io = new Server(http, {
+// const redisClient = new Redis({
+//   host: "crowdconnect-cache-1wdwao.serverless.euc1.cache.amazonaws.com",
+//   port: 6379,
+//   // User: "default",
+//   // username: "default",
+//   // password: "bwI3sry6Ye568AkcipJfpd6pQsb5ybNZ",
+//   maxRetriesPerRequest: 100,
+//   // connectTimeout: 10000,
+//   // commandTimeout: 5000,
+
+//   // host: process.env.REDIS_ENDPOINT,
+//   // port: 6379,
+// });
+
+const pubClient = redisClient.duplicate();
+const subClient = redisClient.duplicate();
+
+const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
@@ -84,9 +102,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createChannel", async (channelName, callback) => {
-    let newChannel = null;
+    // redisClient.get(channelName, async (error, cachedData) => {
+    //   if (error) return reject(err);
+
+    //   if (cachedData) {
+    //     console.log("✅ Daten aus Redis geladen");
+    //     return resolve(JSON.parse(cachedData)); // Direkt zurückgeben
+    //   }
+    // });
+
     try {
-      newChannel = await createChannel({
+      await createChannel({
         name: channelName,
         ownerId: socket.id,
         isLive: false,
@@ -104,6 +130,7 @@ io.on("connection", (socket) => {
     _getChannelsInfo()
       .then((channelsInfo) => {
         // Benutzer sollen nur Live-Kanäle angezeigt bekommen
+        console.log("channelsinfo", channelsInfo);
         socket.emit("updatedChannels", channelsInfo);
         return callback();
       })
@@ -161,21 +188,35 @@ io.on("connection", (socket) => {
   socket.on("joinChannel", async (channelName, callback) => {
     let user = null;
 
+    // Clean channel name
+    channelName = channelName.trim().toLowerCase();
+
+    let channel = null;
     try {
-      user = await assignChannelToUser(socket.id, channelName);
-      await setIsLiveAttributeValue(channelName, true);
+      channel = await fetchChannelByName(channelName);
     } catch (error) {
-      console.error(
-        `Assigning channel '${channelName}' to user with ID '${socket.id}' failed:`,
-        error.cause || error
-      );
+      console.error(`Fetching channel '${channelName}' failed:`, error);
       return callback(
-        error.userMessage ||
-          "Der Channel konnte nicht beigetreten werden, weil ein unerwarteter Fehler aufgetreten ist."
+        "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
       );
     }
 
-    socket.join(user.channelName);
+    if (channel.ownerId === socket.id) {
+      try {
+        await setIsLiveAttributeValue(channelName, true);
+      } catch (error) {
+        console.error(
+          `Assigning channel '${channelName}' to user with ID '${socket.id}' failed:`,
+          error.cause || error
+        );
+        return callback(
+          error.userMessage ||
+            "Der Channel konnte nicht beigetreten werden, weil ein unerwarteter Fehler aufgetreten ist."
+        );
+      }
+    }
+
+    socket.join(channelName);
 
     socket.emit("message", `Welcome to the channel '${channelName}'!`);
     socket.broadcast.to(user.channelName).emit("userJoined", user.username);
@@ -211,7 +252,7 @@ io.on("connection", (socket) => {
     try {
       channel = await fetchChannelByName(channelName);
     } catch (error) {
-      console.error(`Fetching channel '${channelName}' failed:`, error);
+      return console.error(`Fetching channel '${channelName}' failed:`, error);
     }
 
     if (channel.ownerId === socket.id) {
@@ -262,8 +303,8 @@ io.on("connection", (socket) => {
     console.log(`WebSocket connection disconnected: ${socket.id}`);
 
     try {
-      await deleteUser(socket.id);
-      await deleteChannelsWithOwner(socket.id);
+      deleteUser(socket.id);
+      deleteChannelsWithOwner(socket.id);
     } catch (error) {
       console.error(
         `Deleting disconnecting user with ID '${socket.id}' failed:`,
@@ -282,46 +323,45 @@ channelsEmitter.on("deletedChannel", (channelName) => {
 });
 
 async function _getChannelsInfo() {
-  let channelsInfo = [];
-
-  let allChannels = [];
   try {
-    allChannels = await fetchChannels();
+    const allChannels = fetchChannels();
+
+    const channelsInfo = await allChannels.then((channels) =>
+      Promise.allSettled(channels.map(_getChannelInfos))
+    );
+
+    return channelsInfo.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+      console.error(result.reason);
+      return allChannels[index];
+    });
   } catch (error) {
-    console.error("Getting channels info failed:", error);
+    console.error("Fetching channels info failed:", error);
     throw error;
   }
+}
 
-  channelsInfo = await Promise.all(
-    allChannels.map(async (channel) => {
-      try {
-        const usersWithoutOwner = (
-          await fetchUsersInChannel(channel.name)
-        ).filter((user) => user.id !== channel.ownerId);
-        const owner = await fetchUserById(channel.ownerId);
+async function _getChannelInfos(channel) {
+  try {
+    const members = await io.in(channel.name).fetchSockets();
+    const owner = await fetchUserById(channel.ownerId);
 
-        if (!owner) {
-          throw new Error(
-            `A user with the ID ${channel.ownerId} does not exist.`
-          );
-        }
+    if (!owner) {
+      console.error(`User with ID ${channel.ownerId} not found.`);
+      return { ownerName: null, userCount: members.length - 1, ...channel }; // userCount: Users without owner
+    }
 
-        return {
-          ownerName: owner.username,
-          userCount: usersWithoutOwner.length,
-          ...channel,
-        };
-      } catch (error) {
-        console.error(
-          `An error occured while trying to get the channels info:`,
-          error
-        );
-        return { ownerName: "", userCount: null, ...channel };
-      }
-    })
-  );
-
-  return channelsInfo;
+    return {
+      ownerName: owner.username,
+      userCount: members.length - 1,
+      ...channel,
+    };
+  } catch (error) {
+    console.error(`Error fetching info for channel ${channel.name}:`, error);
+    return { ownerName: null, userCount: null, ...channel };
+  }
 }
 
 app.get("/health", (req, res) => {
@@ -334,7 +374,6 @@ app.get("/health", (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`server runs on port ${PORT}`);
 });
