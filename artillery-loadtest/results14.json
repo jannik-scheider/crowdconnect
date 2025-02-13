@@ -1,0 +1,2652 @@
+{
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 18,
+        "vusers.created": 18,
+        "engine.socketio.emit": 162
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 20
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437541377,
+      "lastCounterAt": 1739437549721,
+      "firstMetricAt": 1739437541377,
+      "lastMetricAt": 1739437549721,
+      "period": "1739437540000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 29,
+        "vusers.created": 29,
+        "engine.socketio.emit": 261
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 30
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437550376,
+      "lastCounterAt": 1739437559844,
+      "firstMetricAt": 1739437550376,
+      "lastMetricAt": 1739437559844,
+      "period": "1739437550000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 30,
+        "vusers.created": 30,
+        "engine.socketio.emit": 270
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 30
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437560377,
+      "lastCounterAt": 1739437569758,
+      "firstMetricAt": 1739437560377,
+      "lastMetricAt": 1739437569758,
+      "period": "1739437560000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 40,
+        "vusers.created": 40,
+        "engine.socketio.emit": 353
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 38
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437570380,
+      "lastCounterAt": 1739437579989,
+      "firstMetricAt": 1739437570380,
+      "lastMetricAt": 1739437579989,
+      "period": "1739437570000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 40,
+        "vusers.created": 40,
+        "engine.socketio.emit": 352
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 37
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437580109,
+      "lastCounterAt": 1739437589915,
+      "firstMetricAt": 1739437580109,
+      "lastMetricAt": 1739437589915,
+      "period": "1739437580000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 450,
+        "vusers.created_by_name.Connections Test": 50,
+        "vusers.created": 50
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 46
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437590056,
+      "lastCounterAt": 1739437599976,
+      "firstMetricAt": 1739437590056,
+      "lastMetricAt": 1739437599976,
+      "period": "1739437590000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 50,
+        "vusers.created": 50,
+        "engine.socketio.emit": 465,
+        "vusers.failed": 0,
+        "vusers.completed": 16
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 49
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437600000,
+      "firstHistogramAt": 1739437601960,
+      "lastCounterAt": 1739437609932,
+      "lastHistogramAt": 1739437608995,
+      "firstMetricAt": 1739437600000,
+      "lastMetricAt": 1739437609932,
+      "period": "1739437600000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 60505.2,
+          "max": 60961.3,
+          "count": 16,
+          "mean": 60652.7,
+          "p50": 60495.1,
+          "median": 60495.1,
+          "p75": 60495.1,
+          "p90": 60495.1,
+          "p95": 60495.1,
+          "p99": 60495.1,
+          "p999": 60495.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 60505.2,
+          "max": 60961.3,
+          "count": 16,
+          "mean": 60652.7,
+          "p50": 60495.1,
+          "median": 60495.1,
+          "p75": 60495.1,
+          "p90": 60495.1,
+          "p95": 60495.1,
+          "p99": 60495.1,
+          "p999": 60495.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 60,
+        "vusers.created": 60,
+        "engine.socketio.emit": 526,
+        "vusers.failed": 0,
+        "vusers.completed": 28
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 55
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437610049,
+      "firstHistogramAt": 1739437610049,
+      "lastCounterAt": 1739437619982,
+      "lastHistogramAt": 1739437619387,
+      "firstMetricAt": 1739437610049,
+      "lastMetricAt": 1739437619982,
+      "period": "1739437610000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 60459.4,
+          "max": 60909.2,
+          "count": 28,
+          "mean": 60732.2,
+          "p50": 60495.1,
+          "median": 60495.1,
+          "p75": 60495.1,
+          "p90": 60495.1,
+          "p95": 60495.1,
+          "p99": 60495.1,
+          "p999": 60495.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 60459.4,
+          "max": 60909.2,
+          "count": 28,
+          "mean": 60732.2,
+          "p50": 60495.1,
+          "median": 60495.1,
+          "p75": 60495.1,
+          "p90": 60495.1,
+          "p95": 60495.1,
+          "p99": 60495.1,
+          "p999": 60495.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 501,
+        "vusers.created_by_name.Connections Test": 60,
+        "vusers.created": 60,
+        "vusers.failed": 0,
+        "vusers.completed": 27
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 52
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437620133,
+      "firstHistogramAt": 1739437620375,
+      "lastCounterAt": 1739437629983,
+      "lastHistogramAt": 1739437629622,
+      "firstMetricAt": 1739437620133,
+      "lastMetricAt": 1739437629983,
+      "period": "1739437620000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 60883.5,
+          "max": 62475.7,
+          "count": 27,
+          "mean": 61781.8,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 61717.2,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 60883.5,
+          "max": 62475.7,
+          "count": 27,
+          "mean": 61781.8,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 61717.2,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 635,
+        "vusers.failed": 0,
+        "vusers.completed": 40,
+        "vusers.created_by_name.Connections Test": 69,
+        "vusers.created": 69
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 66
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437630064,
+      "firstHistogramAt": 1739437630130,
+      "lastCounterAt": 1739437639987,
+      "lastHistogramAt": 1739437639885,
+      "firstMetricAt": 1739437630064,
+      "lastMetricAt": 1739437639987,
+      "period": "1739437630000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 61328.4,
+          "max": 62819.2,
+          "count": 40,
+          "mean": 61940,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 61328.4,
+          "max": 62819.2,
+          "count": 40,
+          "mean": 61940,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 647,
+        "vusers.failed": 0,
+        "vusers.completed": 36,
+        "vusers.created_by_name.Connections Test": 70,
+        "vusers.created": 70
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 67
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437640028,
+      "firstHistogramAt": 1739437640032,
+      "lastCounterAt": 1739437649983,
+      "lastHistogramAt": 1739437649341,
+      "firstMetricAt": 1739437640028,
+      "lastMetricAt": 1739437649983,
+      "period": "1739437640000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 61203.6,
+          "max": 62528.5,
+          "count": 36,
+          "mean": 61783.3,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 61717.2,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 61203.6,
+          "max": 62528.5,
+          "count": 36,
+          "mean": 61783.3,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 61717.2,
+          "p90": 61717.2,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 716,
+        "vusers.failed": 0,
+        "vusers.completed": 49,
+        "vusers.created_by_name.Connections Test": 79,
+        "vusers.created": 79
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 73
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437650057,
+      "firstHistogramAt": 1739437650180,
+      "lastCounterAt": 1739437659984,
+      "lastHistogramAt": 1739437659875,
+      "firstMetricAt": 1739437650057,
+      "lastMetricAt": 1739437659984,
+      "period": "1739437650000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 61239.6,
+          "max": 63209.6,
+          "count": 49,
+          "mean": 62191.9,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 61239.6,
+          "max": 63209.6,
+          "count": 49,
+          "mean": 62191.9,
+          "p50": 61717.2,
+          "median": 61717.2,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 687,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 43
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 71
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437660032,
+      "firstHistogramAt": 1739437660032,
+      "lastCounterAt": 1739437669984,
+      "lastHistogramAt": 1739437669857,
+      "firstMetricAt": 1739437660032,
+      "lastMetricAt": 1739437669984,
+      "period": "1739437660000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 61795.4,
+          "max": 63430.9,
+          "count": 43,
+          "mean": 62652.6,
+          "p50": 62964,
+          "median": 62964,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 61795.4,
+          "max": 63430.9,
+          "count": 43,
+          "mean": 62652.6,
+          "p50": 62964,
+          "median": 62964,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 62964,
+          "p99": 62964,
+          "p999": 62964
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 54,
+        "engine.socketio.emit": 751,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 79
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437670058,
+      "firstHistogramAt": 1739437670058,
+      "lastCounterAt": 1739437679984,
+      "lastHistogramAt": 1739437679638,
+      "firstMetricAt": 1739437670058,
+      "lastMetricAt": 1739437679984,
+      "period": "1739437670000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 62074.1,
+          "max": 63671.8,
+          "count": 54,
+          "mean": 62978.2,
+          "p50": 62964,
+          "median": 62964,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 64236,
+          "p99": 64236,
+          "p999": 64236
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 62074.1,
+          "max": 63671.8,
+          "count": 54,
+          "mean": 62978.2,
+          "p50": 62964,
+          "median": 62964,
+          "p75": 62964,
+          "p90": 62964,
+          "p95": 64236,
+          "p99": 64236,
+          "p999": 64236
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 694,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 45
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 71
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437680064,
+      "firstHistogramAt": 1739437680569,
+      "lastCounterAt": 1739437689984,
+      "lastHistogramAt": 1739437689757,
+      "firstMetricAt": 1739437680064,
+      "lastMetricAt": 1739437689984,
+      "period": "1739437680000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 63982.2,
+          "max": 66718.2,
+          "count": 45,
+          "mean": 65059.5,
+          "p50": 64236,
+          "median": 64236,
+          "p75": 65533.7,
+          "p90": 65533.7,
+          "p95": 65533.7,
+          "p99": 66857.6,
+          "p999": 66857.6
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 63982.2,
+          "max": 66718.2,
+          "count": 45,
+          "mean": 65059.5,
+          "p50": 64236,
+          "median": 64236,
+          "p75": 65533.7,
+          "p90": 65533.7,
+          "p95": 65533.7,
+          "p99": 66857.6,
+          "p999": 66857.6
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 55,
+        "engine.socketio.emit": 708,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 73
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437690064,
+      "firstHistogramAt": 1739437690093,
+      "lastCounterAt": 1739437699986,
+      "lastHistogramAt": 1739437699207,
+      "firstMetricAt": 1739437690064,
+      "lastMetricAt": 1739437699986,
+      "period": "1739437690000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 65858.4,
+          "max": 68302.3,
+          "count": 55,
+          "mean": 67058.6,
+          "p50": 66857.6,
+          "median": 66857.6,
+          "p75": 66857.6,
+          "p90": 68208.3,
+          "p95": 68208.3,
+          "p99": 68208.3,
+          "p999": 68208.3
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 65858.4,
+          "max": 68302.3,
+          "count": 55,
+          "mean": 67058.6,
+          "p50": 66857.6,
+          "median": 66857.6,
+          "p75": 66857.6,
+          "p90": 68208.3,
+          "p95": 68208.3,
+          "p99": 68208.3,
+          "p999": 68208.3
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 666,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 57
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 70
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437700030,
+      "firstHistogramAt": 1739437700116,
+      "lastCounterAt": 1739437709984,
+      "lastHistogramAt": 1739437709756,
+      "firstMetricAt": 1739437700030,
+      "lastMetricAt": 1739437709984,
+      "period": "1739437700000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 66941.8,
+          "max": 69838.6,
+          "count": 57,
+          "mean": 68311.6,
+          "p50": 68208.3,
+          "median": 68208.3,
+          "p75": 68208.3,
+          "p90": 69586.2,
+          "p95": 69586.2,
+          "p99": 69586.2,
+          "p999": 69586.2
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 66941.8,
+          "max": 69838.6,
+          "count": 57,
+          "mean": 68311.6,
+          "p50": 68208.3,
+          "median": 68208.3,
+          "p75": 68208.3,
+          "p90": 69586.2,
+          "p95": 69586.2,
+          "p99": 69586.2,
+          "p999": 69586.2
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 682,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 59
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 69
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437710064,
+      "firstHistogramAt": 1739437710230,
+      "lastCounterAt": 1739437719984,
+      "lastHistogramAt": 1739437719686,
+      "firstMetricAt": 1739437710064,
+      "lastMetricAt": 1739437719984,
+      "period": "1739437710000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 68718.3,
+          "max": 71556.2,
+          "count": 59,
+          "mean": 69907.1,
+          "p50": 69586.2,
+          "median": 69586.2,
+          "p75": 69586.2,
+          "p90": 70992,
+          "p95": 70992,
+          "p99": 70992,
+          "p999": 70992
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 68718.3,
+          "max": 71556.2,
+          "count": 59,
+          "mean": 69907.1,
+          "p50": 69586.2,
+          "median": 69586.2,
+          "p75": 69586.2,
+          "p90": 70992,
+          "p95": 70992,
+          "p99": 70992,
+          "p999": 70992
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 649,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 67
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 67
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437720064,
+      "firstHistogramAt": 1739437720149,
+      "lastCounterAt": 1739437729984,
+      "lastHistogramAt": 1739437729830,
+      "firstMetricAt": 1739437720064,
+      "lastMetricAt": 1739437729984,
+      "period": "1739437720000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 70381.2,
+          "max": 72874.4,
+          "count": 67,
+          "mean": 71675.3,
+          "p50": 70992,
+          "median": 70992,
+          "p75": 72426.2,
+          "p90": 72426.2,
+          "p95": 72426.2,
+          "p99": 72426.2,
+          "p999": 72426.2
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 70381.2,
+          "max": 72874.4,
+          "count": 67,
+          "mean": 71675.3,
+          "p50": 70992,
+          "median": 70992,
+          "p75": 72426.2,
+          "p90": 72426.2,
+          "p95": 72426.2,
+          "p99": 72426.2,
+          "p999": 72426.2
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 645,
+        "vusers.failed": 0,
+        "vusers.completed": 58,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 67
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437730065,
+      "firstHistogramAt": 1739437730271,
+      "lastCounterAt": 1739437739984,
+      "lastHistogramAt": 1739437739835,
+      "firstMetricAt": 1739437730065,
+      "lastMetricAt": 1739437739984,
+      "period": "1739437730000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 71349.8,
+          "max": 75846.2,
+          "count": 58,
+          "mean": 73575.1,
+          "p50": 73889.3,
+          "median": 73889.3,
+          "p75": 75382,
+          "p90": 75382,
+          "p95": 75382,
+          "p99": 75382,
+          "p999": 75382
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 71349.8,
+          "max": 75846.2,
+          "count": 58,
+          "mean": 73575.1,
+          "p50": 73889.3,
+          "median": 73889.3,
+          "p75": 75382,
+          "p90": 75382,
+          "p95": 75382,
+          "p99": 75382,
+          "p999": 75382
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 625,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 62
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 65
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437740064,
+      "firstHistogramAt": 1739437741382,
+      "lastCounterAt": 1739437749984,
+      "lastHistogramAt": 1739437749888,
+      "firstMetricAt": 1739437740064,
+      "lastMetricAt": 1739437749984,
+      "period": "1739437740000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 75466.7,
+          "max": 77916.6,
+          "count": 62,
+          "mean": 76794.4,
+          "p50": 76904.9,
+          "median": 76904.9,
+          "p75": 76904.9,
+          "p90": 76904.9,
+          "p95": 76904.9,
+          "p99": 78458.5,
+          "p999": 78458.5
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 75466.7,
+          "max": 77916.6,
+          "count": 62,
+          "mean": 76794.4,
+          "p50": 76904.9,
+          "median": 76904.9,
+          "p75": 76904.9,
+          "p90": 76904.9,
+          "p95": 76904.9,
+          "p99": 78458.5,
+          "p999": 78458.5
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 641,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 56
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 68
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437750002,
+      "firstHistogramAt": 1739437750801,
+      "lastCounterAt": 1739437759984,
+      "lastHistogramAt": 1739437759409,
+      "firstMetricAt": 1739437750002,
+      "lastMetricAt": 1739437759984,
+      "period": "1739437750000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 77070.4,
+          "max": 81165.3,
+          "count": 56,
+          "mean": 78972.1,
+          "p50": 78458.5,
+          "median": 78458.5,
+          "p75": 80043.6,
+          "p90": 80043.6,
+          "p95": 80043.6,
+          "p99": 80043.6,
+          "p999": 80043.6
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 77070.4,
+          "max": 81165.3,
+          "count": 56,
+          "mean": 78972.1,
+          "p50": 78458.5,
+          "median": 78458.5,
+          "p75": 80043.6,
+          "p90": 80043.6,
+          "p95": 80043.6,
+          "p99": 80043.6,
+          "p999": 80043.6
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 647,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 60
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 66
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437760044,
+      "firstHistogramAt": 1739437760191,
+      "lastCounterAt": 1739437769984,
+      "lastHistogramAt": 1739437769811,
+      "firstMetricAt": 1739437760044,
+      "lastMetricAt": 1739437769984,
+      "period": "1739437760000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 80435.1,
+          "max": 83271.8,
+          "count": 60,
+          "mean": 82035.2,
+          "p50": 81660.6,
+          "median": 81660.6,
+          "p75": 83310.3,
+          "p90": 83310.3,
+          "p95": 83310.3,
+          "p99": 83310.3,
+          "p999": 83310.3
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 80435.1,
+          "max": 83271.8,
+          "count": 60,
+          "mean": 82035.2,
+          "p50": 81660.6,
+          "median": 81660.6,
+          "p75": 83310.3,
+          "p90": 83310.3,
+          "p95": 83310.3,
+          "p99": 83310.3,
+          "p999": 83310.3
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 653,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 57
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 67
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437770055,
+      "firstHistogramAt": 1739437770536,
+      "lastCounterAt": 1739437779984,
+      "lastHistogramAt": 1739437779639,
+      "firstMetricAt": 1739437770055,
+      "lastMetricAt": 1739437779984,
+      "period": "1739437770000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 83117.9,
+          "max": 86437.2,
+          "count": 57,
+          "mean": 84739,
+          "p50": 84993.4,
+          "median": 84993.4,
+          "p75": 84993.4,
+          "p90": 84993.4,
+          "p95": 84993.4,
+          "p99": 86710.4,
+          "p999": 86710.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 83117.9,
+          "max": 86437.2,
+          "count": 57,
+          "mean": 84739,
+          "p50": 84993.4,
+          "median": 84993.4,
+          "p75": 84993.4,
+          "p90": 84993.4,
+          "p95": 84993.4,
+          "p99": 86710.4,
+          "p999": 86710.4
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 604,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 55
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 62
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437780026,
+      "firstHistogramAt": 1739437780717,
+      "lastCounterAt": 1739437789984,
+      "lastHistogramAt": 1739437789889,
+      "firstMetricAt": 1739437780026,
+      "lastMetricAt": 1739437789984,
+      "period": "1739437780000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 85999.2,
+          "max": 89121.5,
+          "count": 55,
+          "mean": 87891.7,
+          "p50": 88462.1,
+          "median": 88462.1,
+          "p75": 88462.1,
+          "p90": 88462.1,
+          "p95": 88462.1,
+          "p99": 88462.1,
+          "p999": 88462.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 85999.2,
+          "max": 89121.5,
+          "count": 55,
+          "mean": 87891.7,
+          "p50": 88462.1,
+          "median": 88462.1,
+          "p75": 88462.1,
+          "p90": 88462.1,
+          "p95": 88462.1,
+          "p99": 88462.1,
+          "p999": 88462.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 614,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 49
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 63
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437790003,
+      "firstHistogramAt": 1739437790814,
+      "lastCounterAt": 1739437799984,
+      "lastHistogramAt": 1739437799657,
+      "firstMetricAt": 1739437790003,
+      "lastMetricAt": 1739437799984,
+      "period": "1739437790000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 89155.5,
+          "max": 92988,
+          "count": 49,
+          "mean": 91368.7,
+          "p50": 92072.4,
+          "median": 92072.4,
+          "p75": 92072.4,
+          "p90": 92072.4,
+          "p95": 92072.4,
+          "p99": 92072.4,
+          "p999": 92072.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 89155.5,
+          "max": 92988,
+          "count": 49,
+          "mean": 91368.7,
+          "p50": 92072.4,
+          "median": 92072.4,
+          "p75": 92072.4,
+          "p90": 92072.4,
+          "p95": 92072.4,
+          "p99": 92072.4,
+          "p999": 92072.4
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 578,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 43
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 61
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437800064,
+      "firstHistogramAt": 1739437800650,
+      "lastCounterAt": 1739437809984,
+      "lastHistogramAt": 1739437809543,
+      "firstMetricAt": 1739437800064,
+      "lastMetricAt": 1739437809984,
+      "period": "1739437800000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 93053.8,
+          "max": 97271.6,
+          "count": 43,
+          "mean": 95642.4,
+          "p50": 95830.1,
+          "median": 95830.1,
+          "p75": 95830.1,
+          "p90": 97766.1,
+          "p95": 97766.1,
+          "p99": 97766.1,
+          "p999": 97766.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 93053.8,
+          "max": 97271.6,
+          "count": 43,
+          "mean": 95642.4,
+          "p50": 95830.1,
+          "median": 95830.1,
+          "p75": 95830.1,
+          "p90": 97766.1,
+          "p95": 97766.1,
+          "p99": 97766.1,
+          "p999": 97766.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 602,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 55
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 62
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437810002,
+      "firstHistogramAt": 1739437810537,
+      "lastCounterAt": 1739437819984,
+      "lastHistogramAt": 1739437819722,
+      "firstMetricAt": 1739437810002,
+      "lastMetricAt": 1739437819984,
+      "period": "1739437810000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 97222.6,
+          "max": 100755.7,
+          "count": 55,
+          "mean": 99374.6,
+          "p50": 99741.2,
+          "median": 99741.2,
+          "p75": 99741.2,
+          "p90": 99741.2,
+          "p95": 99741.2,
+          "p99": 99741.2,
+          "p999": 99741.2
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 97222.6,
+          "max": 100755.7,
+          "count": 55,
+          "mean": 99374.6,
+          "p50": 99741.2,
+          "median": 99741.2,
+          "p75": 99741.2,
+          "p90": 99741.2,
+          "p95": 99741.2,
+          "p99": 99741.2,
+          "p999": 99741.2
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 595,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 37
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 64
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437820064,
+      "firstHistogramAt": 1739437821449,
+      "lastCounterAt": 1739437829984,
+      "lastHistogramAt": 1739437829216,
+      "firstMetricAt": 1739437820064,
+      "lastMetricAt": 1739437829984,
+      "period": "1739437820000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 101282.5,
+          "max": 105706.2,
+          "count": 37,
+          "mean": 103935.2,
+          "p50": 103811.8,
+          "median": 103811.8,
+          "p75": 105909,
+          "p90": 105909,
+          "p95": 105909,
+          "p99": 105909,
+          "p999": 105909
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 101282.5,
+          "max": 105706.2,
+          "count": 37,
+          "mean": 103935.2,
+          "p50": 103811.8,
+          "median": 103811.8,
+          "p75": 105909,
+          "p90": 105909,
+          "p95": 105909,
+          "p99": 105909,
+          "p999": 105909
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 525,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80,
+        "vusers.failed": 0,
+        "vusers.completed": 46
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 54
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437830064,
+      "firstHistogramAt": 1739437830671,
+      "lastCounterAt": 1739437839998,
+      "lastHistogramAt": 1739437839128,
+      "firstMetricAt": 1739437830064,
+      "lastMetricAt": 1739437839998,
+      "period": "1739437830000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 105687.1,
+          "max": 109739.4,
+          "count": 46,
+          "mean": 108086,
+          "p50": 108048.6,
+          "median": 108048.6,
+          "p75": 108048.6,
+          "p90": 110231.4,
+          "p95": 110231.4,
+          "p99": 110231.4,
+          "p999": 110231.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 105687.1,
+          "max": 109739.4,
+          "count": 46,
+          "mean": 108086,
+          "p50": 108048.6,
+          "median": 108048.6,
+          "p75": 108048.6,
+          "p90": 110231.4,
+          "p95": 110231.4,
+          "p99": 110231.4,
+          "p999": 110231.4
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 600,
+        "vusers.failed": 0,
+        "vusers.completed": 46,
+        "vusers.created_by_name.Connections Test": 80,
+        "vusers.created": 80
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 62
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437840023,
+      "firstHistogramAt": 1739437840193,
+      "lastCounterAt": 1739437849985,
+      "lastHistogramAt": 1739437849971,
+      "firstMetricAt": 1739437840023,
+      "lastMetricAt": 1739437849985,
+      "period": "1739437840000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 109996.3,
+          "max": 114674.3,
+          "count": 46,
+          "mean": 112253.7,
+          "p50": 112458.3,
+          "median": 112458.3,
+          "p75": 112458.3,
+          "p90": 114730.2,
+          "p95": 114730.2,
+          "p99": 114730.2,
+          "p999": 114730.2
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 109996.3,
+          "max": 114674.3,
+          "count": 46,
+          "mean": 112253.7,
+          "p50": 112458.3,
+          "median": 112458.3,
+          "p75": 112458.3,
+          "p90": 114730.2,
+          "p95": 114730.2,
+          "p99": 114730.2,
+          "p999": 114730.2
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 46,
+        "engine.socketio.emit": 614,
+        "vusers.created_by_name.Connections Test": 71,
+        "vusers.created": 71
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 62
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437850000,
+      "firstHistogramAt": 1739437850000,
+      "lastCounterAt": 1739437859989,
+      "lastHistogramAt": 1739437858183,
+      "firstMetricAt": 1739437850000,
+      "lastMetricAt": 1739437859989,
+      "period": "1739437850000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 114047.7,
+          "max": 118209.9,
+          "count": 46,
+          "mean": 116256.7,
+          "p50": 117048,
+          "median": 117048,
+          "p75": 117048,
+          "p90": 117048,
+          "p95": 117048,
+          "p99": 117048,
+          "p999": 117048
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 114047.7,
+          "max": 118209.9,
+          "count": 46,
+          "mean": 116256.7,
+          "p50": 117048,
+          "median": 117048,
+          "p75": 117048,
+          "p90": 117048,
+          "p95": 117048,
+          "p99": 117048,
+          "p999": 117048
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 43,
+        "engine.socketio.emit": 495,
+        "vusers.created_by_name.Connections Test": 70,
+        "vusers.created": 70
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 51
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437860028,
+      "firstHistogramAt": 1739437860245,
+      "lastCounterAt": 1739437869988,
+      "lastHistogramAt": 1739437869597,
+      "firstMetricAt": 1739437860028,
+      "lastMetricAt": 1739437869988,
+      "period": "1739437860000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 118293.6,
+          "max": 123136.2,
+          "count": 43,
+          "mean": 120769.7,
+          "p50": 121824.9,
+          "median": 121824.9,
+          "p75": 121824.9,
+          "p90": 121824.9,
+          "p95": 124286,
+          "p99": 124286,
+          "p999": 124286
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 118293.6,
+          "max": 123136.2,
+          "count": 43,
+          "mean": 120769.7,
+          "p50": 121824.9,
+          "median": 121824.9,
+          "p75": 121824.9,
+          "p90": 121824.9,
+          "p95": 124286,
+          "p99": 124286,
+          "p999": 124286
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 61,
+        "vusers.created": 61,
+        "engine.socketio.emit": 423,
+        "vusers.failed": 0,
+        "vusers.completed": 36
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 46
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437870066,
+      "firstHistogramAt": 1739437870800,
+      "lastCounterAt": 1739437879987,
+      "lastHistogramAt": 1739437877435,
+      "firstMetricAt": 1739437870066,
+      "lastMetricAt": 1739437879987,
+      "period": "1739437870000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 123603.2,
+          "max": 126853.1,
+          "count": 36,
+          "mean": 125029.5,
+          "p50": 124286,
+          "median": 124286,
+          "p75": 126796.9,
+          "p90": 126796.9,
+          "p95": 126796.9,
+          "p99": 126796.9,
+          "p999": 126796.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 123603.2,
+          "max": 126853.1,
+          "count": 36,
+          "mean": 125029.5,
+          "p50": 124286,
+          "median": 124286,
+          "p75": 126796.9,
+          "p90": 126796.9,
+          "p95": 126796.9,
+          "p99": 126796.9,
+          "p999": 126796.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 607,
+        "vusers.failed": 0,
+        "vusers.completed": 48,
+        "vusers.created_by_name.Connections Test": 60,
+        "vusers.created": 60
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 64
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437880000,
+      "firstHistogramAt": 1739437880181,
+      "lastCounterAt": 1739437889988,
+      "lastHistogramAt": 1739437889449,
+      "firstMetricAt": 1739437880000,
+      "lastMetricAt": 1739437889988,
+      "period": "1739437880000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 128046.1,
+          "max": 132673.3,
+          "count": 48,
+          "mean": 130332.6,
+          "p50": 129358.4,
+          "median": 129358.4,
+          "p75": 131971.7,
+          "p90": 131971.7,
+          "p95": 131971.7,
+          "p99": 131971.7,
+          "p999": 131971.7
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 128046.1,
+          "max": 132673.3,
+          "count": 48,
+          "mean": 130332.6,
+          "p50": 129358.4,
+          "median": 129358.4,
+          "p75": 131971.7,
+          "p90": 131971.7,
+          "p95": 131971.7,
+          "p99": 131971.7,
+          "p999": 131971.7
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 524,
+        "vusers.created_by_name.Connections Test": 50,
+        "vusers.created": 50,
+        "vusers.failed": 0,
+        "vusers.completed": 45
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 56
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437890282,
+      "firstHistogramAt": 1739437891879,
+      "lastCounterAt": 1739437899939,
+      "lastHistogramAt": 1739437899718,
+      "firstMetricAt": 1739437890282,
+      "lastMetricAt": 1739437899939,
+      "period": "1739437890000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 133549.3,
+          "max": 137218.2,
+          "count": 45,
+          "mean": 135232.2,
+          "p50": 134637.8,
+          "median": 134637.8,
+          "p75": 134637.8,
+          "p90": 137357.8,
+          "p95": 137357.8,
+          "p99": 137357.8,
+          "p999": 137357.8
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 133549.3,
+          "max": 137218.2,
+          "count": 45,
+          "mean": 135232.2,
+          "p50": 134637.8,
+          "median": 134637.8,
+          "p75": 134637.8,
+          "p90": 137357.8,
+          "p95": 137357.8,
+          "p99": 137357.8,
+          "p999": 137357.8
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Connections Test": 50,
+        "vusers.created": 50,
+        "engine.socketio.emit": 471,
+        "vusers.failed": 0,
+        "vusers.completed": 36
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 50
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437900086,
+      "firstHistogramAt": 1739437900705,
+      "lastCounterAt": 1739437909939,
+      "lastHistogramAt": 1739437909631,
+      "firstMetricAt": 1739437900086,
+      "lastMetricAt": 1739437909939,
+      "period": "1739437900000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 137644,
+          "max": 142196.8,
+          "count": 36,
+          "mean": 139080.2,
+          "p50": 137357.8,
+          "median": 137357.8,
+          "p75": 140132.7,
+          "p90": 140132.7,
+          "p95": 140132.7,
+          "p99": 140132.7,
+          "p999": 140132.7
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 137644,
+          "max": 142196.8,
+          "count": 36,
+          "mean": 139080.2,
+          "p50": 137357.8,
+          "median": 137357.8,
+          "p75": 140132.7,
+          "p90": 140132.7,
+          "p95": 140132.7,
+          "p99": 140132.7,
+          "p999": 140132.7
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 509,
+        "vusers.failed": 0,
+        "vusers.completed": 52,
+        "vusers.created_by_name.Connections Test": 40,
+        "vusers.created": 40
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 51
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437910051,
+      "firstHistogramAt": 1739437910051,
+      "lastCounterAt": 1739437919988,
+      "lastHistogramAt": 1739437919419,
+      "firstMetricAt": 1739437910051,
+      "lastMetricAt": 1739437919988,
+      "period": "1739437910000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 142320.3,
+          "max": 146200.2,
+          "count": 52,
+          "mean": 144199,
+          "p50": 142963.7,
+          "median": 142963.7,
+          "p75": 145851.8,
+          "p90": 145851.8,
+          "p95": 145851.8,
+          "p99": 145851.8,
+          "p999": 145851.8
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 142320.3,
+          "max": 146200.2,
+          "count": 52,
+          "mean": 144199,
+          "p50": 142963.7,
+          "median": 142963.7,
+          "p75": 145851.8,
+          "p90": 145851.8,
+          "p95": 145851.8,
+          "p99": 145851.8,
+          "p999": 145851.8
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 470,
+        "vusers.failed": 0,
+        "vusers.completed": 36,
+        "vusers.created_by_name.Connections Test": 40,
+        "vusers.created": 40
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 49
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437920028,
+      "firstHistogramAt": 1739437920470,
+      "lastCounterAt": 1739437929902,
+      "lastHistogramAt": 1739437929787,
+      "firstMetricAt": 1739437920028,
+      "lastMetricAt": 1739437929902,
+      "period": "1739437920000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 145828.2,
+          "max": 151352,
+          "count": 36,
+          "mean": 149463.9,
+          "p50": 148798.3,
+          "median": 148798.3,
+          "p75": 151804.3,
+          "p90": 151804.3,
+          "p95": 151804.3,
+          "p99": 151804.3,
+          "p999": 151804.3
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 145828.2,
+          "max": 151352,
+          "count": 36,
+          "mean": 149463.9,
+          "p50": 148798.3,
+          "median": 148798.3,
+          "p75": 151804.3,
+          "p90": 151804.3,
+          "p95": 151804.3,
+          "p99": 151804.3,
+          "p999": 151804.3
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 383,
+        "vusers.failed": 0,
+        "vusers.completed": 44,
+        "vusers.created_by_name.Connections Test": 30,
+        "vusers.created": 30
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 43
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437930284,
+      "firstHistogramAt": 1739437930418,
+      "lastCounterAt": 1739437939982,
+      "lastHistogramAt": 1739437939434,
+      "firstMetricAt": 1739437930284,
+      "lastMetricAt": 1739437939982,
+      "period": "1739437930000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 150908.9,
+          "max": 155960.5,
+          "count": 44,
+          "mean": 153215.8,
+          "p50": 151804.3,
+          "median": 151804.3,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 150908.9,
+          "max": 155960.5,
+          "count": 44,
+          "mean": 153215.8,
+          "p50": 151804.3,
+          "median": 151804.3,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 486,
+        "vusers.created_by_name.Connections Test": 30,
+        "vusers.created": 30,
+        "vusers.failed": 0,
+        "vusers.completed": 37
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 52
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437940000,
+      "firstHistogramAt": 1739437940894,
+      "lastCounterAt": 1739437949687,
+      "lastHistogramAt": 1739437949687,
+      "firstMetricAt": 1739437940000,
+      "lastMetricAt": 1739437949687,
+      "period": "1739437940000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 156409.6,
+          "max": 161289.3,
+          "count": 37,
+          "mean": 158376.2,
+          "p50": 157999.8,
+          "median": 157999.8,
+          "p75": 157999.8,
+          "p90": 161191.7,
+          "p95": 161191.7,
+          "p99": 161191.7,
+          "p999": 161191.7
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 156409.6,
+          "max": 161289.3,
+          "count": 37,
+          "mean": 158376.2,
+          "p50": 157999.8,
+          "median": 157999.8,
+          "p75": 157999.8,
+          "p90": 161191.7,
+          "p95": 161191.7,
+          "p99": 161191.7,
+          "p999": 161191.7
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 497,
+        "vusers.created_by_name.Connections Test": 21,
+        "vusers.created": 21,
+        "vusers.failed": 0,
+        "vusers.completed": 44
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 51
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437950046,
+      "firstHistogramAt": 1739437950938,
+      "lastCounterAt": 1739437959984,
+      "lastHistogramAt": 1739437959984,
+      "firstMetricAt": 1739437950046,
+      "lastMetricAt": 1739437959984,
+      "period": "1739437950000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 162169.7,
+          "max": 166221.6,
+          "count": 44,
+          "mean": 164185,
+          "p50": 164448.1,
+          "median": 164448.1,
+          "p75": 164448.1,
+          "p90": 164448.1,
+          "p95": 164448.1,
+          "p99": 164448.1,
+          "p999": 164448.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 162169.7,
+          "max": 166221.6,
+          "count": 44,
+          "mean": 164185,
+          "p50": 164448.1,
+          "median": 164448.1,
+          "p75": 164448.1,
+          "p90": 164448.1,
+          "p95": 164448.1,
+          "p99": 164448.1,
+          "p999": 164448.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 55,
+        "engine.socketio.emit": 426,
+        "vusers.created_by_name.Connections Test": 2,
+        "vusers.created": 2
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 45
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437960019,
+      "firstHistogramAt": 1739437960019,
+      "lastCounterAt": 1739437969878,
+      "lastHistogramAt": 1739437969878,
+      "firstMetricAt": 1739437960019,
+      "lastMetricAt": 1739437969878,
+      "period": "1739437960000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 166035.3,
+          "max": 170581.6,
+          "count": 55,
+          "mean": 168211.8,
+          "p50": 167770.3,
+          "median": 167770.3,
+          "p75": 167770.3,
+          "p90": 167770.3,
+          "p95": 171159.6,
+          "p99": 171159.6,
+          "p999": 171159.6
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 166035.3,
+          "max": 170581.6,
+          "count": 55,
+          "mean": 168211.8,
+          "p50": 167770.3,
+          "median": 167770.3,
+          "p75": 167770.3,
+          "p90": 167770.3,
+          "p95": 171159.6,
+          "p99": 171159.6,
+          "p999": 171159.6
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 390,
+        "vusers.failed": 0,
+        "vusers.completed": 40
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 44
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437970151,
+      "firstHistogramAt": 1739437972030,
+      "lastCounterAt": 1739437979454,
+      "lastHistogramAt": 1739437979454,
+      "firstMetricAt": 1739437970151,
+      "lastMetricAt": 1739437979454,
+      "period": "1739437970000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 170085.5,
+          "max": 174019.6,
+          "count": 40,
+          "mean": 171438.4,
+          "p50": 171159.6,
+          "median": 171159.6,
+          "p75": 171159.6,
+          "p90": 174617.4,
+          "p95": 174617.4,
+          "p99": 174617.4,
+          "p999": 174617.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 170085.5,
+          "max": 174019.6,
+          "count": 40,
+          "mean": 171438.4,
+          "p50": 171159.6,
+          "median": 171159.6,
+          "p75": 171159.6,
+          "p90": 174617.4,
+          "p95": 174617.4,
+          "p99": 174617.4,
+          "p999": 174617.4
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 48,
+        "engine.socketio.emit": 387
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 43
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437980169,
+      "firstHistogramAt": 1739437980169,
+      "lastCounterAt": 1739437989800,
+      "lastHistogramAt": 1739437989800,
+      "firstMetricAt": 1739437980169,
+      "lastMetricAt": 1739437989800,
+      "period": "1739437980000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 173377.3,
+          "max": 178365.5,
+          "count": 48,
+          "mean": 175649.1,
+          "p50": 174617.4,
+          "median": 174617.4,
+          "p75": 178145,
+          "p90": 178145,
+          "p95": 178145,
+          "p99": 178145,
+          "p999": 178145
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 173377.3,
+          "max": 178365.5,
+          "count": 48,
+          "mean": 175649.1,
+          "p50": 174617.4,
+          "median": 174617.4,
+          "p75": 178145,
+          "p90": 178145,
+          "p95": 178145,
+          "p99": 178145,
+          "p999": 178145
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 53,
+        "engine.socketio.emit": 383
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 42
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739437990040,
+      "firstHistogramAt": 1739437990058,
+      "lastCounterAt": 1739437999926,
+      "lastHistogramAt": 1739437999926,
+      "firstMetricAt": 1739437990040,
+      "lastMetricAt": 1739437999926,
+      "period": "1739437990000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 177565.3,
+          "max": 181824.9,
+          "count": 53,
+          "mean": 179753.6,
+          "p50": 178145,
+          "median": 178145,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 177565.3,
+          "max": 181824.9,
+          "count": 53,
+          "mean": 179753.6,
+          "p50": 178145,
+          "median": 178145,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 422,
+        "vusers.failed": 0,
+        "vusers.completed": 74
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 44
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438000050,
+      "firstHistogramAt": 1739438000390,
+      "lastCounterAt": 1739438009729,
+      "lastHistogramAt": 1739438009729,
+      "firstMetricAt": 1739438000050,
+      "lastMetricAt": 1739438009729,
+      "period": "1739438000000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 181037.1,
+          "max": 183138.8,
+          "count": 74,
+          "mean": 182023.4,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 181037.1,
+          "max": 183138.8,
+          "count": 74,
+          "mean": 182023.4,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 468,
+        "vusers.failed": 0,
+        "vusers.completed": 71
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 47
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438010046,
+      "firstHistogramAt": 1739438010379,
+      "lastCounterAt": 1739438019955,
+      "lastHistogramAt": 1739438018988,
+      "firstMetricAt": 1739438010046,
+      "lastMetricAt": 1739438019955,
+      "period": "1739438010000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 182018.4,
+          "max": 183627.4,
+          "count": 71,
+          "mean": 182761.5,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 182018.4,
+          "max": 183627.4,
+          "count": 71,
+          "mean": 182761.5,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 86,
+        "engine.socketio.emit": 427
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 45
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438020078,
+      "firstHistogramAt": 1739438020195,
+      "lastCounterAt": 1739438029682,
+      "lastHistogramAt": 1739438029140,
+      "firstMetricAt": 1739438020078,
+      "lastMetricAt": 1739438029682,
+      "period": "1739438020000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 181696.4,
+          "max": 183854.3,
+          "count": 86,
+          "mean": 182801,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 185415.5,
+          "p999": 185415.5
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 181696.4,
+          "max": 183854.3,
+          "count": 86,
+          "mean": 182801,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 185415.5,
+          "p999": 185415.5
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 124,
+        "engine.socketio.emit": 227
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 27
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438030137,
+      "firstHistogramAt": 1739438030137,
+      "lastCounterAt": 1739438039986,
+      "lastHistogramAt": 1739438039986,
+      "firstMetricAt": 1739438030137,
+      "lastMetricAt": 1739438039986,
+      "period": "1739438030000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 175492.3,
+          "max": 182811.8,
+          "count": 124,
+          "mean": 179568.1,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 175492.3,
+          "max": 182811.8,
+          "count": 124,
+          "mean": 179568.1,
+          "p50": 181743.9,
+          "median": 181743.9,
+          "p75": 181743.9,
+          "p90": 181743.9,
+          "p95": 181743.9,
+          "p99": 181743.9,
+          "p999": 181743.9
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 181,
+        "engine.socketio.emit": 46
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 5
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438040011,
+      "firstHistogramAt": 1739438040011,
+      "lastCounterAt": 1739438049818,
+      "lastHistogramAt": 1739438049818,
+      "firstMetricAt": 1739438040011,
+      "lastMetricAt": 1739438049818,
+      "period": "1739438040000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 155307.4,
+          "max": 175318.2,
+          "count": 181,
+          "mean": 165359.5,
+          "p50": 164448.1,
+          "median": 164448.1,
+          "p75": 171159.6,
+          "p90": 174617.4,
+          "p95": 174617.4,
+          "p99": 174617.4,
+          "p999": 174617.4
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 155307.4,
+          "max": 175318.2,
+          "count": 181,
+          "mean": 165359.5,
+          "p50": 164448.1,
+          "median": 164448.1,
+          "p75": 171159.6,
+          "p90": 174617.4,
+          "p95": 174617.4,
+          "p99": 174617.4,
+          "p999": 174617.4
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 49,
+        "vusers.failed": 0,
+        "vusers.completed": 49
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 5
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438050040,
+      "firstHistogramAt": 1739438050150,
+      "lastCounterAt": 1739438059846,
+      "lastHistogramAt": 1739438059846,
+      "firstMetricAt": 1739438050040,
+      "lastMetricAt": 1739438059846,
+      "period": "1739438050000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 155404.6,
+          "max": 156967.5,
+          "count": 49,
+          "mean": 156020.7,
+          "p50": 154871.1,
+          "median": 154871.1,
+          "p75": 154871.1,
+          "p90": 157999.8,
+          "p95": 157999.8,
+          "p99": 157999.8,
+          "p999": 157999.8
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 155404.6,
+          "max": 156967.5,
+          "count": 49,
+          "mean": 156020.7,
+          "p50": 154871.1,
+          "median": 154871.1,
+          "p75": 154871.1,
+          "p90": 157999.8,
+          "p95": 157999.8,
+          "p99": 157999.8,
+          "p999": 157999.8
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 53,
+        "vusers.failed": 0,
+        "vusers.completed": 53
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 5
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438060213,
+      "firstHistogramAt": 1739438060415,
+      "lastCounterAt": 1739438069703,
+      "lastHistogramAt": 1739438069703,
+      "firstMetricAt": 1739438060213,
+      "lastMetricAt": 1739438069703,
+      "period": "1739438060000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 153303,
+          "max": 156021.6,
+          "count": 53,
+          "mean": 154544.8,
+          "p50": 154871.1,
+          "median": 154871.1,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 153303,
+          "max": 156021.6,
+          "count": 53,
+          "mean": 154544.8,
+          "p50": 154871.1,
+          "median": 154871.1,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 59,
+        "vusers.failed": 0,
+        "vusers.completed": 56
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 7
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438070310,
+      "firstHistogramAt": 1739438070504,
+      "lastCounterAt": 1739438079955,
+      "lastHistogramAt": 1739438079664,
+      "firstMetricAt": 1739438070310,
+      "lastMetricAt": 1739438079955,
+      "period": "1739438070000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 149262.3,
+          "max": 154300,
+          "count": 56,
+          "mean": 152162.4,
+          "p50": 151804.3,
+          "median": 151804.3,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 149262.3,
+          "max": 154300,
+          "count": 56,
+          "mean": 152162.4,
+          "p50": 151804.3,
+          "median": 151804.3,
+          "p75": 154871.1,
+          "p90": 154871.1,
+          "p95": 154871.1,
+          "p99": 154871.1,
+          "p999": 154871.1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.failed": 0,
+        "vusers.completed": 57,
+        "engine.socketio.emit": 54
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 6
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438080101,
+      "firstHistogramAt": 1739438080101,
+      "lastCounterAt": 1739438089750,
+      "lastHistogramAt": 1739438089750,
+      "firstMetricAt": 1739438080101,
+      "lastMetricAt": 1739438089750,
+      "period": "1739438080000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 141246.5,
+          "max": 150222.1,
+          "count": 57,
+          "mean": 145668.6,
+          "p50": 145851.8,
+          "median": 145851.8,
+          "p75": 148798.3,
+          "p90": 148798.3,
+          "p95": 148798.3,
+          "p99": 148798.3,
+          "p999": 148798.3
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 141246.5,
+          "max": 150222.1,
+          "count": 57,
+          "mean": 145668.6,
+          "p50": 145851.8,
+          "median": 145851.8,
+          "p75": 148798.3,
+          "p90": 148798.3,
+          "p95": 148798.3,
+          "p99": 148798.3,
+          "p999": 148798.3
+        }
+      }
+    },
+    {
+      "counters": {
+        "engine.socketio.emit": 26,
+        "vusers.failed": 0,
+        "vusers.completed": 26
+      },
+      "rates": {
+        "engine.socketio.emit_rate": 8
+      },
+      "engine.socketio.emit_rate": null,
+      "firstCounterAt": 1739438090268,
+      "firstHistogramAt": 1739438090465,
+      "lastCounterAt": 1739438094934,
+      "lastHistogramAt": 1739438094934,
+      "firstMetricAt": 1739438090268,
+      "lastMetricAt": 1739438094934,
+      "period": "1739438090000",
+      "summaries": {
+        "vusers.session_length": {
+          "min": 134315.4,
+          "max": 141078.8,
+          "count": 26,
+          "mean": 137894.6,
+          "p50": 137357.8,
+          "median": 137357.8,
+          "p75": 140132.7,
+          "p90": 140132.7,
+          "p95": 140132.7,
+          "p99": 140132.7,
+          "p999": 140132.7
+        }
+      },
+      "histograms": {
+        "vusers.session_length": {
+          "min": 134315.4,
+          "max": 141078.8,
+          "count": 26,
+          "mean": 137894.6,
+          "p50": 137357.8,
+          "median": 137357.8,
+          "p75": 140132.7,
+          "p90": 140132.7,
+          "p95": 140132.7,
+          "p99": 140132.7,
+          "p999": 140132.7
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.Connections Test": 2640,
+      "vusers.created": 2640,
+      "engine.socketio.emit": 26400,
+      "vusers.failed": 0,
+      "vusers.completed": 2640
+    },
+    "rates": {
+      "engine.socketio.emit_rate": 50
+    },
+    "firstCounterAt": 1739437541377,
+    "firstHistogramAt": 1739437601960,
+    "lastCounterAt": 1739438094934,
+    "lastHistogramAt": 1739438094934,
+    "firstMetricAt": 1739437541377,
+    "lastMetricAt": 1739438094934,
+    "period": 1739438090000,
+    "summaries": {
+      "vusers.session_length": {
+        "min": 60459.4,
+        "max": 183854.3,
+        "count": 2640,
+        "mean": 122524.3,
+        "p50": 126796.9,
+        "median": 126796.9,
+        "p75": 164448.1,
+        "p90": 181743.9,
+        "p95": 181743.9,
+        "p99": 181743.9,
+        "p999": 185415.5
+      }
+    },
+    "histograms": {
+      "vusers.session_length": {
+        "min": 60459.4,
+        "max": 183854.3,
+        "count": 2640,
+        "mean": 122524.3,
+        "p50": 126796.9,
+        "median": 126796.9,
+        "p75": 164448.1,
+        "p90": 181743.9,
+        "p95": 181743.9,
+        "p99": 181743.9,
+        "p999": 185415.5
+      }
+    }
+  },
+  "testId": "tbbnq_hdaz3eyd7x5kz8qjd54fqzw6yxgn6_bf5d",
+  "metadata": {
+    "tags": [
+      {
+        "name": "name",
+        "value": "high-user-nachrichten.yaml"
+      }
+    ],
+    "count": 1,
+    "region": "eu-central-1",
+    "cluster": "artilleryio-cluster",
+    "artilleryVersion": {
+      "core": "2.0.21",
+      "pro": "2.0.21"
+    }
+  },
+  "ensure": []
+}
