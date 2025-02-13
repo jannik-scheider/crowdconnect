@@ -8,7 +8,7 @@ require("dotenv").config();
 const os = require("os");
 
 const {
-  createUser, 
+  createUser,
   deleteUser,
   removeChannelFromUser,
   fetchUserById,
@@ -78,16 +78,17 @@ io.on("connection", (socket) => {
   socket.on("createUser", async (username, callback) => {
     try {
       await createUser({ id: socket.id, username });
-      callback({status: "success", message: "user created"});
+      callback({ status: "success", message: "user created" });
     } catch (error) {
       console.error("Creating user failed:", error.cause || error);
 
       // TODO: Benutzer-Fehlermeldung erzeugen und ausgeben
-      callback({status: "error", message:
-        error.userErrorMessage ||
-          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
-      }
-      );
+      callback({
+        status: "error",
+        message:
+          error.userErrorMessage ||
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut.",
+      });
     }
   });
 
@@ -105,21 +106,28 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createChannel", async (channelName, callback) => {
-    // redisClient.get(channelName, async (error, cachedData) => {
-    //   if (error) return reject(err);
-
-    //   if (cachedData) {
-    //     console.log("✅ Daten aus Redis geladen");
-    //     return resolve(JSON.parse(cachedData)); // Direkt zurückgeben
-    //   }
-    // });
+    redisClient.get(channelName, (error, cachedData) => {
+      if (error) {
+        console.log("create channel error", error);
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
+      }
+      if (cachedData) {
+        socket.emit("updatedChannels", JSON.parse(cachedData));
+      }
+    });
 
     try {
-      await createChannel({
+      const channel = await createChannel({
         name: channelName,
         ownerId: socket.id,
         isLive: false,
       });
+
+      if (channel) {
+        redisClient.set(channel.name, JSON.stringify(channel));
+      }
     } catch (error) {
       console.error(
         `Creating channel '${channelName}' failed:`,
@@ -130,10 +138,23 @@ io.on("connection", (socket) => {
       );
     }
 
+    redisClient.get("channelsInfo", (error, cachedData) => {
+      if (error) {
+        return callback(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+        );
+      }
+      if (cachedData) {
+        socket.emit("updatedChannels", JSON.parse(cachedData));
+      }
+    });
+
     _getChannelsInfo()
       .then((channelsInfo) => {
         // Benutzer sollen nur Live-Kanäle angezeigt bekommen
         console.log("channelsinfo", channelsInfo);
+
+        redisClient.set("channelsInfo", JSON.stringify(channelsInfo));
         socket.emit("updatedChannels", channelsInfo);
         return callback();
       })
@@ -191,6 +212,15 @@ io.on("connection", (socket) => {
   socket.on("joinChannel", async (channelName, callback) => {
     let user = null;
 
+    try {
+      user = await fetchUserById(socket.id);
+    } catch (error) {
+      console.error(`Joining channel ${channelName} failed:`, error);
+      return callback(
+        "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu und versuchen es erneut."
+      );
+    }
+
     // Clean channel name
     channelName = channelName.trim().toLowerCase();
 
@@ -222,7 +252,7 @@ io.on("connection", (socket) => {
     socket.join(channelName);
 
     socket.emit("message", `Welcome to the channel '${channelName}'!`);
-    socket.broadcast.to(user.channelName).emit("userJoined", user.username);
+    socket.broadcast.to(channelName).emit("userJoined", user.username);
 
     _getChannelsInfo()
       .then((channelsInfo) => {
@@ -278,29 +308,31 @@ io.on("connection", (socket) => {
       });
   });
 
-  socket.on("chatMessage", async (payload) => {
+  socket.on("chatMessage", async (data) => {
     let user = null;
     let error = null;
     const hostname = os.hostname();
-    console.log(payload);
+    console.log(data.payload);
     try {
       user = await fetchUserById(socket.id);
     } catch (err) {
-      console.error("Linked user of received chat message could not be fetched:", error);
+      console.error(
+        "Linked user of received chat message could not be fetched:",
+        error
+      );
       error = err;
     }
     if (!user || error) {
       return;
     }
 
-    message = payload.message + hostname;
-    io.to(user.channelName).emit("chatMessage", {
+    message = data.payload.message + hostname;
+    io.to(channelName).emit("chatMessage", {
       username: user.username,
       message: message,
-      latency: payload.latency
+      latency: data.payload.latency,
     });
   });
-  
 
   socket.on("disconnect", async () => {
     console.log(`WebSocket connection disconnected: ${socket.id}`);

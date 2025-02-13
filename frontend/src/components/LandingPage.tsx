@@ -53,6 +53,8 @@ const LandingPage: React.FC = () => {
     });
 
     function onUpdatedChannelsEvent(updatedChannels: ChannelInfo[]) {
+      console.log("updated channels", updatedChannels);
+
       const liveChannels = updatedChannels
         .filter((channel) => channel.ownerId !== socket.id)
         .filter(({ isLive }) => !!isLive);
@@ -70,7 +72,7 @@ const LandingPage: React.FC = () => {
     return () => {
       socket.off("updatedChannels", onUpdatedChannelsEvent);
 
-      //   socket.disconnect();
+      // socket.disconnect();
     };
   }, []);
 

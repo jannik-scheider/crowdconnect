@@ -17,6 +17,7 @@ interface ChannelInfo {
   userCount: number;
   name: string;
   ownerId: string;
+  isLive: boolean;
 }
 
 interface Message {
@@ -46,6 +47,7 @@ const ChannelPage: React.FC = () => {
         channels
           .sort((a, b) => b.userCount - a.userCount) // Nach Anzahl der Zuschauer sortieren (absteigend)
           .filter((channel) => channel.name !== channelName) // Diesen Channel ausblenden
+          .filter(({ isLive }) => !!isLive) // Nur Live-Channels anzeigen
           // .filter((channel) => channel.userCount > 0) // Channels mit 0 Zuschauern ignorieren
           .slice(0, 10)
       ); // Auf die ersten 10 Elemente begrenzen
@@ -91,11 +93,11 @@ const ChannelPage: React.FC = () => {
   useEffect(() => {
     function onChatMessageEvent(message: Message) {
       const now = Date.now();
-      
+
       // Die Zeit, die zwischen "Abschicken bei X" und "Angekommen/Angezeigt bei Y" vergangen ist
-      const latencyMs = now - message.latency; 
+      const latencyMs = now - message.latency;
       console.log("Latenz (ms):", latencyMs);
-    
+
       setMessages((prev) => [
         ...prev,
         {
@@ -110,7 +112,11 @@ const ChannelPage: React.FC = () => {
     function onUserJoinedEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat betreten.`, latency: Date.now() },
+        {
+          username: "System",
+          message: `${username} hat den Chat betreten.`,
+          latency: Date.now(),
+        },
       ]);
     }
 
@@ -121,7 +127,7 @@ const ChannelPage: React.FC = () => {
           username: "System",
           message:
             "Der Host hat den Channel verlassen. Der Channel wird in 5 Sekunden geschlossen.",
-          latency: Date.now()
+          latency: Date.now(),
         },
       ]);
 
@@ -131,7 +137,11 @@ const ChannelPage: React.FC = () => {
     function onUserLeftEvent(username: string) {
       setMessages((prev) => [
         ...prev,
-        { username: "System", message: `${username} hat den Chat verlassen.`,  latency: Date.now()},
+        {
+          username: "System",
+          message: `${username} hat den Chat verlassen.`,
+          latency: Date.now(),
+        },
       ]);
     }
 
@@ -147,7 +157,7 @@ const ChannelPage: React.FC = () => {
           username: "System",
           message:
             "Dieser Chatroom wurde gelöscht und wird in 5 Sekunden geschlossen.",
-          latency: Date.now()
+          latency: Date.now(),
         },
       ]);
 
@@ -195,7 +205,7 @@ const ChannelPage: React.FC = () => {
         message: message,
         latency: Date.now(), // Zeitstempel in Millisekunden
       };
-      socket.emit("chatMessage", payload);
+      socket.emit("chatMessage", { payload, channelName });
       setMessage("");
     }
   };
@@ -306,7 +316,7 @@ const ChannelPage: React.FC = () => {
 
         <iframe
           className="rounded h-full"
-          src={`https://player.twitch.tv/?channel=${"NoWay4u_Sir"}&parent=${"localhost"}`}
+          src={`https://player.twitch.tv/?channel=${"NoWay4u_Sir"}&parent=${"crowdconnect.fun"}`}
           width="100%"
           allowFullScreen
           frameBorder="0"
