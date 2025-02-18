@@ -1,9 +1,9 @@
-# 1. ECR Repository erstellen
+# create ecr repository
 resource "aws_ecr_repository" "live_chat_repo" {
   name = "live-chat-app"
 }
 
-# 2. VPC erstellen
+# create vpc
 resource "aws_vpc" "live_chat_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -52,7 +52,7 @@ resource "aws_subnet" "private_subnet_b" {
 }
 
 
-# Internet Gateway erstellen
+# create internet gateway
 resource "aws_internet_gateway" "live_chat_igw" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
@@ -61,8 +61,7 @@ resource "aws_internet_gateway" "live_chat_igw" {
   }
 }
 
-# Route Tables für public und private Subnetze erstellen:
-# Public Route Table mit Internet Gateway
+# public route table with internet gateway
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.live_chat_vpc.id
   tags = {
@@ -86,7 +85,7 @@ resource "aws_route_table_association" "public_rta_b" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-# NAT Gateway im Public Subnetz erstellen
+# create nat gateway
 resource "aws_eip" "nat_eip" {
   vpc = true
   tags = {
@@ -103,7 +102,7 @@ resource "aws_nat_gateway" "nat_gw" {
   depends_on = [aws_internet_gateway.live_chat_igw]
 }
 
-# Private Route Table mit NAT Gateway
+# route table for private subnets
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.live_chat_vpc.id
   tags = {
@@ -127,7 +126,7 @@ resource "aws_route_table_association" "private_rta_b" {
   route_table_id = aws_route_table.private_rt.id
 }
 
-# ALB Security Group (alb_sg): Erlaubt eingehenden Traffic von 0.0.0.0/0 auf Port 80/443.
+# security group for alb
 resource "aws_security_group" "alb_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
@@ -139,7 +138,6 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Falls gewünscht: HTTP Ingress für Weiterleitung
   ingress {
     from_port   = 80
     to_port     = 80
@@ -160,7 +158,7 @@ resource "aws_security_group" "alb_sg" {
 }
 
 
-# ECS Service Security Group (live_chat_service_sg): Erlaubt eingehenden Traffic nur von der ALB-SG auf Port 3000. Kein direkter Zugriff aus dem Internet.
+# security group for ecs
 resource "aws_security_group" "live_chat_service_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
@@ -168,7 +166,7 @@ resource "aws_security_group" "live_chat_service_sg" {
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id] # ALB SG als Quelle
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
   egress {
@@ -185,11 +183,11 @@ resource "aws_security_group" "live_chat_service_sg" {
 
 resource "aws_cloudwatch_log_group" "live_chat_logs" {
   name              = "/ecs/live-chat-task"
-  retention_in_days = 7 # oder gewünschter Aufbewahrungszeitraum
+  retention_in_days = 7
 }
 
 
-# 5. ECS Cluster
+# create ecs cluster
 resource "aws_ecs_cluster" "live_chat_cluster" {
   name = "live-chat-cluster"
 
@@ -200,7 +198,7 @@ resource "aws_ecs_cluster" "live_chat_cluster" {
 }
 
 
-# 6. Task-Definition
+# task definition
 resource "aws_ecs_task_definition" "live_chat_task" {
   family                   = "live-chat-task"
   network_mode             = "awsvpc"
@@ -238,11 +236,8 @@ resource "aws_ecs_task_definition" "live_chat_task" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          # CloudWatch Log Group
-          "awslogs-group" = "${aws_cloudwatch_log_group.live_chat_logs.name}"
-          # Region deiner Infrastruktur
-          "awslogs-region" = "eu-central-1"
-          # Wird später zur Unterscheidung der Container-Streams benutzt
+          "awslogs-group"         = "${aws_cloudwatch_log_group.live_chat_logs.name}"
+          "awslogs-region"        = "eu-central-1"
           "awslogs-stream-prefix" = "live-chat"
         }
       }
@@ -252,7 +247,7 @@ resource "aws_ecs_task_definition" "live_chat_task" {
       image     = "public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest",
       cpu       = 0,
       memory    = 128,
-      essential = false, // "false", damit der Agent-Container optional ist und dein Hauptcontainer weiterlaufen kann
+      essential = false,
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -261,10 +256,9 @@ resource "aws_ecs_task_definition" "live_chat_task" {
           "awslogs-stream-prefix" = "cwagent"
         }
       },
-      // Variante A: Konfiguration als Env-Variable
       environment = [
         {
-          name  = "CW_CONFIG_CONTENT" // Name beliebig
+          name  = "CW_CONFIG_CONTENT"
           value = <<EOF
 {
   "agent": {
@@ -299,26 +293,18 @@ resource "aws_ecs_task_definition" "live_chat_task" {
 EOF
         }
       ],
-      // Startbefehl: übergebe die Env-Variable als Konfigfile
+      // Start command: transfer the Env variable as a config file
       entryPoint = [
         "/opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent"
       ],
       command = [
-        "-config", "/tmp/cwagent-config.json", // Pfad, unter dem die Datei gespeichert werden soll
-        "-configmap", "CW_CONFIG_CONTENT",     // Sagt dem Agent, er soll den Inhalt aus Env verwenden
+        "-config", "/tmp/cwagent-config.json", // Path under which the file is to be saved
+        "-configmap", "CW_CONFIG_CONTENT",     // Tells the agent to use the content from Env
         "-env"
       ]
     }
   ])
 }
-
-
-
-
-
-
-
-
 
 
 data "aws_iam_policy_document" "cloudwatch_agent_policy_doc" {
@@ -345,7 +331,7 @@ resource "aws_iam_role_policy_attachment" "attach_cloudwatch_agent_policy" {
 }
 
 
-# 7. Load Balancer
+# create load balancer
 resource "aws_lb" "live_chat_alb" {
   name               = "live-chat-alb"
   internal           = false
@@ -366,12 +352,12 @@ resource "aws_lb_target_group" "live_chat_target" {
   target_type = "ip"
 
   health_check {
-    path                = "/health" # Endpunkt für den Health Check
-    interval            = 30        # Zeit zwischen Prüfungen in Sekunden
-    timeout             = 5         # Zeit in Sekunden, bevor ein Check fehlschlägt
-    healthy_threshold   = 3         # Anzahl erfolgreicher Checks, um "healthy" zu werden
-    unhealthy_threshold = 2         # Anzahl fehlgeschlagener Checks, um "unhealthy" zu werden
-    matcher             = "200"     # Erwarteter HTTP-Statuscode
+    path                = "/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 2
+    matcher             = "200"
   }
 
   stickiness {
@@ -414,7 +400,7 @@ resource "aws_lb_listener" "live_chat_https_listener" {
 
 
 
-# 8. ECS Service
+# create ecs service
 resource "aws_ecs_service" "live_chat_service" {
   name            = "live-chat-service"
   cluster         = aws_ecs_cluster.live_chat_cluster.id
@@ -442,9 +428,7 @@ resource "aws_ecs_service" "live_chat_service" {
   ]
 }
 
-
-# 10. Skalierbarkeit für den ECS-Service definieren
-
+# scaling for ecs service 
 resource "aws_appautoscaling_target" "ecs_service_target" {
   max_capacity       = 2
   min_capacity       = 1
@@ -472,9 +456,6 @@ resource "aws_appautoscaling_policy" "ecs_service_policy" {
   }
 }
 
-
-# 9. IAM Role für Task-Execution
-# Verwende die bestehende Rolle ecsTaskExecutionRole
 data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
@@ -498,7 +479,6 @@ resource "aws_s3_bucket" "main" {
   bucket = local.s3_bucket_name
 }
 
-# 1) The custom Origin Request Policy that forwards all cookies
 resource "aws_cloudfront_origin_request_policy" "forward_all_cookies" {
   name = "forward-all-cookies"
 
@@ -515,7 +495,6 @@ resource "aws_cloudfront_origin_request_policy" "forward_all_cookies" {
   }
 }
 
-# 2) Updated CloudFront distribution
 resource "aws_cloudfront_distribution" "main" {
   aliases             = [local.domain]
   default_root_object = "index.html"
@@ -523,7 +502,6 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   wait_for_deployment = true
 
-  # Standard Cache Behavior
   default_cache_behavior {
     allowed_methods          = ["GET", "HEAD", "OPTIONS"]
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
@@ -533,15 +511,12 @@ resource "aws_cloudfront_distribution" "main" {
     viewer_protocol_policy   = "redirect-to-https"
   }
 
-  # S3 Origin
   origin {
     domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
     origin_id                = aws_s3_bucket.main.bucket
   }
 
-  # Hier definierst du die Custom Error Responses 
-  # für 403 und 404, damit CloudFront stattdessen deine index.html ausliefert.
   custom_error_response {
     error_code            = 403
     response_code         = 200
@@ -604,15 +579,6 @@ resource "aws_s3_bucket_policy" "main" {
 }
 
 
-
-
-##################################
-#                                 
-# Redis implementierung
-#
-##################################
-
-
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
   name        = "redis-subnet-group"
   description = "Subnet group for Redis"
@@ -629,11 +595,10 @@ resource "aws_security_group" "redis_sg" {
   vpc_id = aws_vpc.live_chat_vpc.id
 
   ingress {
-    description = "Allow inbound from ECS Service SG on Redis port"
-    from_port   = 6379
-    to_port     = 6379
-    protocol    = "tcp"
-    # Aus Sicherheitsgründen direkt die SG deines ECS-Services angeben
+    description     = "Allow inbound from ECS Service SG on Redis port"
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
     security_groups = [aws_security_group.live_chat_service_sg.id]
   }
 
@@ -665,10 +630,6 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   }
 }
 
-
-
-
-##### dynamodb
 
 resource "aws_dynamodb_table" "users" {
   name         = "Users"

@@ -5,7 +5,7 @@ config:
       arrivalRate: 2
   engines:
    socketio-v3:
-      transports: ["websocket"] # Erzwinge WebSocket-Verbindungen
+      transports: ["websocket"]
   processor: "./custom.js" # set a custom processor to load dynamic scenario data
 
 
@@ -18,7 +18,7 @@ scenarios:
           channel: "createUser"
           data: "{{ name }}"
         acknowledge: true
-        timeout: 5000 # Timeout in Millisekunden (5 Sekunden)
+        timeout: 5000 # Timeout in milliseconds
       - emit:
           channel: "joinChannel"
           data: "loadtest"
